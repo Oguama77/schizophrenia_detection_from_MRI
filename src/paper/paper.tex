@@ -47,35 +47,35 @@ To address these challenges, this project aims to systematically experiment with
 
 The raw data were obtained from the \href{http://schizconnect.org}{SchizConnect} database (accessed January 1, 2025), which houses structural and functional MRI data. The database provides filtering options to enable users to select data that meets specific criteria including MRI field strength and clinical diagnosis (e.g. schizophrenia, bipolar disorder).
 
-The data obtained originates from the Center of Biomedical Research Excellence (COBRE) [REF!!!] and MIND Clinical Imaging Consortium (MCICShare) [REF!!!] datasets in NifTI format. It includes data from 310 individuals, 153 with schizophrenia and 157 healthy controls. [CHECK!!!]
+The data obtained originates from the Center of Biomedical Research Excellence (COBRE) [REF!!!] dataset in NifTI format. It includes data from 62 individuals, 30 with schizophrenia and 32 healthy controls. [CHECK!!!]
 
-The data from SchizConnect was filtered based on MRI field strength and clinical diagnosis. We selected only images captured with 3T MRI scans.
+The data from SchizConnect was filtered based on MRI field strength and clinical diagnosis. We retrieved only images captured with 3T MRI scans. This was done to ensure uniformity of the data obtained.
 
-Clinical data was made available in form of csv files. The clinical and demographic features of the dataset used in this project are presented in Table~\ref{tab:cobre_mcicshare_clinical_demographic}.
+Clinical data was made available in form of CSV files. The demographic features of the dataset used in this project are presented in Table~\ref{tab:cobre_mcicshare_clinical_demographic}.
+%Figure~\ref{fig:demographic_features} shows the age and gender distribution.
 
-The demographics of the COBRE and MCICShare datasets, including age and gender distribution are similar.
-
-The COBRE dataset contains images of patients in three diagnosic categories: schizophrenia sctrict, schizoaffective, and no known disorder (healthy controls). MCICShare contains images of patients diagnosed with schizophrenia broad and no known disorder. 
-???However, previous works suggest trying to identify the distinct classes by applying machine learning and deep learning models on only MRI data does not yield good results (Harestad, 2024). 
-Therefore, we grouped all the schizophrenia classes as one. Figures 4 and 5 show the age distribution before and after combining the schizophrenia classes respectively. Figure 6 shows the final gender distribution of the combined dataset.
-
+%\begin{figure}[h]
+%    \centering
+%    \includegraphics[width=0.4\textwidth]{./figs/demographic_features.png}
+%    \caption{Demographic features of the COBRE dataset.}\label%{fig:demographic_features}
+%\end{figure}
 
 % Figs should not duplicate the tables and vice versa
 
 \begin{center}
 	\begin{table}
         \centering
-        \caption{\label{tab:cobre_mcicshare_clinical_demographic}Description!!!.}
+        \caption{\label{tab:cobre_mcicshare_clinical_demographic}The subjects were selected to give a balanced representation of age and gender distributions in the dataset, prioritizing age distribution, which has been shown to affect model performance (ref).}
         \begin{tabular*}{500pt}{@{\extracolsep\fill}lcccccc@{\extracolsep\fill}}
             \toprule
-            & \multicolumn{2}{c}{COBRE} & \multicolumn{2}{c}{$MCICShare$} & \multicolumn{2}{c}{$Combined$}
-            \\\cmidrule{2-4}\cmidrule{5-7}
-            & \textbf{Individuals with SZ (n=83)} & \textbf{Healthy controls (n=105)} & \textbf{Individuals with SZ (n=70)} & \textbf{Healthy controls (n=52)} & \textbf{Individuals with SZ (n=153)} & \textbf{Healthy controls (n=157)} \\
+            & \multicolumn{3}{c}{COBRE}
+            \\\cmidrule{2-4}
+            & \textbf{Individuals with SZ (n=30)} & \textbf{Healthy controls (n=32)} & \textbf{Total (62)} \\
             \midrule
-            Minimum age             & 19  & 18  & 18	& 18 & 18 & 18 \\
-            Maximum age 		    & 66  & 65 & 56 	& 60 & 66 & 65 \\
-            Average age             & 38.2 & 38.7 & 35.5	& 36.6 & 37.0 & 38.0	\\
-            Gender (Male/ Female)   & 68/15 & 75/30 & 51/19	& 30/22 & 119/34 & 105/52	\\
+            Minimum age             & 19  & 18  & 18 \\
+            Maximum age 		    & 66  & 65 & 66  \\
+            Average age             & 39.6 & 41 & 40.3	\\
+            Gender (Male/ Female)   & 19/11 & 17/15 & 36/26	\\
             \bottomrule
         \end{tabular*}
     \end{table}    
@@ -85,167 +85,125 @@ Therefore, we grouped all the schizophrenia classes as one. Figures 4 and 5 show
 \subsection{Image Preprocessing}
 
 % General thoughts
-Why Preprocess MRI Scans?
-Consistency Across Scans: MRI data often comes from different scanners or sessions, leading to variations in intensity ranges, resolutions, and voxel spacing.
-Noise Reduction: Preprocessing can reduce irrelevant noise, helping you calculate more meaningful SNR and PSNR values.
-Standardization: Normalized and resampled data ensures fair comparisons between scans.
-Artifact Removal: Some preprocessing steps (e.g., brain extraction, cropping) focus metrics on the brain region, ignoring irrelevant background areas.
+The major idea behind preprocessing was to establish a standardized pipeline that ensures consistency in the quality and content of the MRI data. This pipeline addressed common issues such as noise, intensity variations, and artifacts, which can affect the performance of machine learning models.
 
-To perform a grid search to find the best combination of parameters for the resample_image function based on signal-to-noise ratio (SNR), you can use a custom test function.
+We experimented with different combinations of preprocessing and data augmentation techniques to determine which pipeline yields the best performance of the ML/DL models regarding recall rate, precision, and F1 score.
+
+In order to find the best combination of hyperparameters for each preprocessing method, we performed a grid search and measured the quality metrics of the processed image using a custom test function.
+
+Table~\ref{tab:preprocessing_pipeline} and Table~\ref{tab:augmentation_pipeline} present the preprocessing and augmentation techniques respectively used and their respective hyperparameters and tools used. Figure~\ref{fig:test_pipeline} gives a visual representation of the conducted tests.
+%
+\begin{center}
+    \begin{table}
+        \centering
+        \caption{\label{tab:preprocessing_pipeline}Preprocessing techniques used in the study.}
+        \begin{tabular*}{500pt}{@{\extracolsep\fill}lcc@{\extracolsep\fill}}
+            \toprule
+            \textbf{Preprocessing Step} & \textbf{Hyperparameters} & \textbf{Tools} \\
+            \midrule
+            Resampling & Voxel size: 1mm & Nibabel library \\
+            Intensity Normalization & Min-max scaling: [0, 1] & NumPy \\
+            Brain Extraction & Modality: T1, U-net & ANTsPyNet \\
+            Cropping & Size: based on the largest bounding box among all images & scikit-image, NumPy \\
+            Smoothing & Gaussian filter: sigma=1.5 & SciPy \\
+            \bottomrule
+            \end{tabular*}
+    \end{table}
+\end{center}
+
+%
+\begin{center}
+    \begin{table}
+        \centering
+        \caption{\label{tab:augmentation_pipeline}Augmentation techniques used in the study.}
+        \begin{tabular*}{500pt}{@{\extracolsep\fill}lcc@{\extracolsep\fill}}
+            \toprule
+            \textbf{Augmentation Step} & \textbf{Hyperparameters} & \textbf{Tools} \\
+            \midrule
+            Rotation & Angle (degrees): 20 & torchvision \\
+            Blurring & Sigma: ...  & NumPy \\
+            Noise & Noise (std): ... & ANTsPyNet \\
+            \bottomrule
+            \end{tabular*}
+    \end{table}
+\end{center}
+%
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.8\textwidth]{./figs/test_pipeline.png}
+    \caption{Tests pipeline for MRI data.}\label{fig:test_pipeline}
+\end{figure}
 
 \subsubsection{Resampling}
-Resample to a Standard Resolution
 
-Structural MRI datasets often vary in resolution. Resampling ensures uniform input for the model.
-
-Resample all scans to a common voxel spacing or resolution. This ensures that metrics like SNR and PSNR are calculated on comparable spatial dimensions.
-
-Why? Different resolutions can lead to different noise and signal profiles.
+The first step of the pipeline is resampling the image to a standard resolution to ensure uniform input for the model and consistent noise and signal profiles.
 
 \subsubsection{intensity normalization}
 
-Normalize voxel intensities to a consistent range (e.g., z-score normalization or min-max scaling).
-This method scales the data to a range of [0, 1]
+The second step of the pipeline is normalization of voxel intensities to a consistent range to maintain the relative scale of the data and produce values in a fixed range to satisfy models expectations. The adopted method scales the data to a range of [0, 1].
 
-Normalize the intensity values of all scans to a consistent range (e.g., [0, 1] or [0, 255]). This ensures that metrics like PSNR are not skewed by varying intensity ranges.
+Normalization also improves the results of brain extraction by helping the algorithm better distinguish between brain and non-brain regions.
 
-Advantages:
-Produces values in a fixed range, which many models expect.
-Maintains the relative scale of the data.
-Disadvantages:
-Sensitive to outliers, as extreme values in the data will dominate the scaling.
-
-You can improve the results of compute_brain_mask by adding preprocessing steps or tweaking its parameters:
-Normalize the intensity values of the MRI data before passing it to compute_brain_mask.
-This helps the algorithm better distinguish between brain and non-brain regions.
+Intensity distributions were inspected to ensure normalization has not distorted the data.
 
 \subsubsection{Brain extraction}
 
-Remove non-brain tissues 
+The third step of the pipeline is a brain extraction. The purpose of this stage is to
+\begin{itemize}
+    \item remove non-brain regions in order to minimizes noise, making it easier for the network to focus on relevant features;
+    \item subsequently enhance the network's performance, especially in a schizophrenia detection task where small differences in brain anatomy are crucial;
+    \item ensure that the input images are more consistent in terms of content, which can help the model generalize better.
+\end{itemize}
 
-To create a function that automatically determines where the brain part is and crops the 3D MRI volume so that the brain remains intact, you can leverage the brain mask generated during brain extraction. 
-
-When Brain Extraction is Necessary
-Focus on Brain Structures:
-If your neural network is specifically designed to analyze brain structures (e.g., cortical thickness, subcortical volumes, lesions), extracting the brain helps eliminate irrelevant information, such as the skull or surrounding tissues, which could confuse the model.
-Many brain-specific datasets and pretrained models (e.g., for segmentation or classification) expect inputs to have only the brain region.
-Reduce Noise:
-Removing non-brain regions minimizes noise, making it easier for the network to focus on relevant features.
-This step can enhance performance, especially in tasks where small differences in brain anatomy are crucial (e.g., schizophrenia detection).
-Standardization:
-Brain extraction ensures that the input images are more consistent in terms of content, which can help the model generalize better.
+The generated brain mask was refined by closing gaps and removing small regions. The mask was also used as a leverage for the cropping step.
 
 % Discuss When Brain Extraction May Not Be Necessary
 
-The nobrainer tool offers pre-trained deep learning models for brain extraction and is designed for robust performance on diverse datasets.
-ANTsPyNet is a Python library that offers neural network architectures and pre-trained models for medical image analysis, including brain extraction.
-
-Apply Morphological Operations:
-Use scipy.ndimage to refine the mask by closing gaps or removing small regions.
+%The nobrainer tool offers pre-trained deep learning models for brain extraction and is designed for robust performance on diverse datasets.ANTsPyNet is a Python library that offers neural network architectures and pre-trained models for medical image analysis, including brain extraction.
 
 \subsubsection{Cropping}
 
-Crop or pad images to a fixed size for uniformity across the dataset.
-Crop the brain region to a consistent size across scans. This step is particularly useful for metrics that compare local intensities.
+The fourth step of the pipeline is cropping the brain region to a consistent size across scans.
 
 \subsubsection{Smoothing}
 
-Smoothing and noise removal can significantly enhance the quality of structural MRI data, improving the signal-to-noise ratio (SNR) and making downstream tasks more robust.
-Why Smooth?
-Reduce Noise: Structural MRI images often contain random noise that can affect feature extraction and model training.
-Enhance Signal: Smoothing can emphasize meaningful structures, such as anatomical boundaries.
-Standardize Images: Makes images consistent and reduces variability introduced by acquisition artifacts.
+The fifth step of the pipeline is smoothing the brain region to reduce noise and variability introduced by acquisition artifacts, enhancing the overall quality of the images. This was done to ensure that the downstream tasks are more robust and the model training is more effective. We used a Gaussian filter to reduce high-frequency noise while preserving edges to some extent. Since the neural network performed a classification task, moderate smoothing was carried out to focus on broader patterns.
 
-How to Smooth?
-Gaussian Smoothing 
-Use a Gaussian filter to smooth images while preserving edges to some extent.
-
-Apply a Gaussian filter to reduce high-frequency noise that might artificially inflate the SNR or PSNR.
-
-Median Filtering
-Effective for removing salt-and-pepper noise.
-
-Wavelet Denoising
-Advanced technique that removes noise while preserving details.
-
-Task-Specific Requirements:
-For tasks requiring high anatomical precision (e.g., detecting small abnormalities), keep smoothing minimal.
-For classification tasks, moderate smoothing may help by focusing on broader patterns.
+The sixth step of the pipeline is normalization of the smoothed image to ensure that ...
 
 \subsubsection{Validation}
 
-validating the results of preprocessing is crucial. Without validation, you risk introducing artifacts or losing critical information, which could undermine the effectiveness of your model. Here’s a structured approach to validate preprocessing:
+The impact of preprocessing on the data's integrity and quality was assessed using a combination of a visual inspection and quantitative metrics. The visual inspection involved plotting a few slices of the MRI before and after each preprocessing step. Validation was performed to ensure that preprocessing steps did not introduce artifacts or distort anatomical structures, and to ensure consistency of the processed images.
 
-1. Visual Inspection
-Why? To ensure preprocessing steps don't introduce artifacts or distort anatomical structures.
-How?
-Plot a few slices of the MRI before and after each preprocessing step.
+Quantitative metrics included Signal-to-Noise Ratio (SNR), Contrast-to-Noise Ratio (CNR), Peak Signal-to-Noise Ratio (PSNR), and 
+Structural Similarity Index (SSIM). 
 
-2. Quantitative Metrics
-Why? To assess the impact of preprocessing on the data's integrity and quality.
-How?
-Calculate metrics before and after preprocessing to track changes.
+Relative PSNR for one image. Using a hypothetical "ideal" signal (the maximum intensity value as a baseline), a relative PSNR for one image was calculated. This relative PSNR was used as a way to assess the "quality" of a single image compared to a theoretical perfect image of uniform intensity.
 
-2.1Signal-to-Noise Ratio (SNR):
-Evaluate how noise levels are reduced while retaining the signal.
-SNR: Measures the ratio of signal to noise in a single image. It does not require a second image for comparison.
+A binary mask was computed using Otsu's thresholding to explicitly select a background region for noise estimation.
 
-SNR Definition:
-In the SNR calculation, you're explicitly defining signal (mean intensity in the brain region) and noise (standard deviation in the background or non-brain region).
-This method isolates the contributions of signal and noise effectively, and thus SNR tends to be higher when the signal is strong relative to noise.
+The metrics were computed for the entire 3D volume to assess the overall quality or similarity of the entire MRI dataset, capturing global differences.
 
-Refine Noise Estimation
-Mask-Based Noise Calculation: Use a binary mask to explicitly select a background region for noise estimation.
-Outside-Brain Noise: If you have brain masks, calculate noise statistics from outside the brain.
-Consider more robust methods like Otsu's thresholding 
-
-Otsu's Threshold is Too Aggressive:
-Otsu's method focuses on separating background from foreground but might miss subtle intensity gradients within the brain.
-1. Adjust the Threshold Dynamically
-Instead of relying entirely on Otsu's threshold, apply a scaling factor to relax it slightly:
-
-2. Combine Threshold Methods
-Use Otsu’s threshold as a base and add a secondary, intensity-based threshold to ensure regions with slightly lower intensities are included
-
-PSNR: Compares two images and is useful for assessing image reconstruction, compression, or denoising performance.
-
-PSNR Definition:
-PSNR compares the similarity between two images (e.g., before and after smoothing).
-It does not explicitly differentiate between signal and noise like SNR does.
-Instead, it uses the difference between the original image (or reference) and the modified image (e.g., smoothed) to calculate the MSE and, ultimately, PSNR.
-
-Alternative: Relative PSNR for One Image
-If you have a hypothetical "ideal" signal (e.g., the maximum intensity value as a baseline), you could calculate a relative PSNR for one image. This relative PSNR could be used as a way to assess the "quality" of a single image compared to a theoretical perfect image of uniform intensity.
-
-2. Contrast-to-Noise Ratio (CNR):
-Compare intensities between regions (e.g., gray matter vs. white matter). Contrast-to-Noise Ratio (CNR): Measures the contrast between regions of interest (e.g., brain vs. background).
-
-3 Histogram Analysis:
-Inspect intensity distributions to ensure normalization has not distorted the data.
-
-In addition to SNR, consider these metrics to evaluate resampled images:
-Mean Squared Error (MSE): Compare resampled and original images voxel-wise to evaluate accuracy.
-
-rmse
-One common approach is to use an idealized reference image, such as an image where all the pixels have the maximum intensity (or another constant value) for comparison
-
-Structural Similarity Index (SSIM): Quantify structural similarity between the resampled and original images.
-when calculating the Structural Similarity Index (SSIM), the goal is to maximize the SSIM value, as a higher SSIM indicates greater similarity between the two images.
-
-
-1. Metrics for the Entire 3D Volume (Your Current Approach):
-When to Use:
-If the analysis aims to assess the overall quality or similarity of the entire MRI dataset.
-When treating the volume as a whole is more relevant (e.g., for registration, segmentation, or other volumetric tasks).
-Advantages:
-Captures global differences and variations across the entire dataset.
-Simpler and faster to compute since it avoids slice-wise computations.
-Disadvantages:
-May obscure slice-level differences (e.g., a few noisy slices might not significantly affect the overall metrics but could be important diagnostically).
 % Discuss Metrics for Each 2D Slice (Slice-wise Approach):
 
 %
 \subsection{Data Augmentation}
+
+1st Method In this method, a shearing angle, which is selected randomly within the range [− 15°, 15°], is used and a shearing operation is applied within the x and y-axis. This operation is repeated 10 times with 10 different shearing angles. By this method, 10 images are generated from an original image.
+
+3rd Method Rotation angles are selected randomly within the range [− 25°, 25°] and clockwise rotations are applied using 10 different angle values. 10 images are generated from an original image by this method.
+
+7th Method In this method, augmentation is provided by Gaussian noise addition (4th method) followed by rotation (3rd method). 30 images are generated from an input image by this method
+
+8th Method In this augmentation method, clockwise rotation and then translation operations are applied. Rotation angles are selected randomly within the range [− 25°, 25°] and translation is applied on the x and y-axis by using different values sampled randomly within the range [− 15, 15]. This successive operation is applied 10 times, and 10 images are generated from an input image by this method.
+
+9th Method In this method, translation is applied followed by the shearing. The translation step is applied on the x and y-axis with different values sampled randomly within the range [− 15, 15]. In the shearing step, an angle is selected randomly within the range [− 15°, 15°], and shearing is applied within the x and y-axis. The subsequent operations are applied 10 times and 10 images are generated from an input image by this method.
+
+10th Method In this method, three operations (translation, shearing, and rotation) are applied subsequently. Implementation of the translation and shearing operations are performed as explained in the 9th method. In the rotation step, a random angle is selected within the range [− 25°, 25°] clockwise rotation is applied. The successive operations are applied 10 times, and 10 images are generated from an input image by this method.
+
+
+
+
 Here are some common transformations you can apply to your MRI images, tailored to medical imaging:
 a. Flips
 Horizontal Flip (RandomHorizontalFlip): Good for brain MRI images, as the brain is symmetric along the sagittal plane.
@@ -283,7 +241,15 @@ Experimentation: Start with conservative parameters (e.g., small rotations, flip
 No Augmentation: Do not apply augmentation to validation or test images. Simply normalize and resize them for consistency:
 
 %
-\subsection{CNN architecture}
+\subsection{Model architectures}
+
+Convolutional Neural Networks (CNNs) are commonly used in the literature for this task [REFS!!]. However, a few papers explored the use of support vector machines for image classification [REFS!!]. To gain a full understanding of both approaches, we decided on the combination of a pretrained deep neural network for feature extraction and a support vector classifier for binary classification. The ReNet-18 architecture was selected for its balance between computational load and accuracy. Cross validation was performed with the support vector classifier to choose the best hyperparameters, and the hyperparameters that yielded the best results were the radial basis function (RBF) kernel, a gamma value of 0.0001 and a C parameter value of 100. Each 2D slice of the images were fed into the ResNet-18 model as NumPy arrays of dimension 224 ✕ 224. This input size corresponds to the size of the images in the ImageNet dataset that was used to train ResNet-18 and was selected for compatibility with the pretrained weights of the ResNet-18 model. Figure~\ref{fig:training_architecture} gives a representation of the training architecture and flow.
+%
+\begin{figure}
+    \centering
+    \includegraphics[width=0.8\textwidth]{./figs/training_architecture.png}
+    \caption{Training architecture and flow.}\label{fig:training_architecture}
+\end{figure}
 
 %
 \subsection{CNN validation}
@@ -322,8 +288,9 @@ PSNR = 45: Indicates that the smoothed image differs moderately from the origina
 % Discussion
 \section{Discussion}
 
-% Random text
-\lipsum[7-8]
+The methods used for brain MR image augmentation have some limitations or drawbacks. For instance, in a study (Isensee et al. 2020), the augmentation approach uses elastic deformations, which add shape variations. However, the deformations can bring lots of damage and noise when the deformation field is varied seriously. Also, the generated images seem not to be realistic and natural. It has been shown in the literature that widely used elastic deformations produce unrealistic brain MR images (Mok and Chung 2018).
+
+augmentation with the combination of shearing and salt-and-pepper noise addition is the least efficient approach for augmentation in improving classification performance 
 
 % Conclusion
 \section{Conclusion}
