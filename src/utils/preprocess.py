@@ -1,6 +1,6 @@
 import os
-import torch
-import pywt
+#import torch
+#import pywt
 import ants
 import antspynet
 import numpy as np
@@ -452,7 +452,7 @@ def apply_wavelet_denoising(data, wavelet='coif1', level=2, threshold=0.05,
 # if the data augmentation is performed (it is performed on training data),
 # then a numpy array is converted to a torch tensor during data augmentation step 
 # otherwise it is converted by __getitem__ of the MRIDataset class
-def to_tensor(data: np.ndarray) -> torch.Tensor:
+'''def to_tensor(data: np.ndarray) -> torch.Tensor:
     """
     Convert numpy array to PyTorch tensor
     
@@ -462,7 +462,7 @@ def to_tensor(data: np.ndarray) -> torch.Tensor:
     Returns:
     torch.Tensor: PyTorch tensor
     """
-    return torch.tensor(data, dtype=torch.float32)
+    return torch.tensor(data, dtype=torch.float32)'''
 
 def preprocess_image(image: nib.Nifti1Image) -> np.ndarray: # TODO: change!
     """
