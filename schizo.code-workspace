@@ -39,7 +39,7 @@
 		"editor.formatOnSave": true,
 		"editor.codeActionsOnSave": {
 			"source.organizeImports": "always",
-			"source.fixAll.ruff": "always",
+			//"source.fixAll.ruff": "always",
 			"source.fixAll": "always"
 		},
 	}

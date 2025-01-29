@@ -2,9 +2,10 @@
 import torch
 import torch.nn as nn
 from torchvision import models
-from sklearn.model_selection import GridSearchCV
-from sklearn.pipeline import make_pipeline
 from sklearn.svm import SVC
+from sklearn.pipeline import make_pipeline
+from sklearn.model_selection import GridSearchCV
+from sklearn.preprocessing import StandardScaler
 
 # ResNet-18 for Feature Extraction
 class FeatureExtractor(nn.Module):
@@ -32,6 +33,7 @@ class FeatureExtractor(nn.Module):
         return x.view(x.size(0), -1)  # Flatten to (batch_size, feature_dim)
     
 # Support Vector Classifier for image classification
-svm_classifier = make_pipeline(StandardScaler(), 
+def vector_classifier():
+    svm_classifier = make_pipeline(StandardScaler(), 
                                SVC(kernel='rbf', probability=True, C= 100, gamma= 0.0001, random_state=42))
-
+    return svm_classifier

@@ -5,6 +5,7 @@ import matplotlib.pyplot as plt
 
 from utils.preprocess import (
     load_nii,
+    get_data,
     resample_image,
     normalize_data,
     extract_brain,
@@ -12,7 +13,12 @@ from utils.preprocess import (
     apply_gaussian_smoothing
 )
 
-def preprocess_pipeline(file_path, steps_to_take: list, what_to_return: list):
+from utils.preprocess_validation import calculate_metrics
+
+def preprocess_pipeline(file_path, 
+                        steps_to_take: list, 
+                        what_to_return: list, 
+                        separation: bool = False):
     """
     Preprocessing pipeline for NIfTI files.
     
@@ -24,15 +30,17 @@ def preprocess_pipeline(file_path, steps_to_take: list, what_to_return: list):
     Returns:
         dict: Dictionary with processed outputs requested in `what_to_return`.
     """
+    # Dictionary to store the output
     to_be_returned = {}
+
     # Load NIfTI file
     nii = load_nii(file_path)
 
     # Resample image
-    if 'resample' in steps_to_take:
-        resampled_image = resample_image(nii, voxel_size=(1, 1, 1), order=0, mode='wrap', cval=0)
+    if 'resample' in steps_to_take :
+        resampled_image = resample_image(nii, voxel_size=(2, 2, 2), order=4, mode='reflect', cval=0)
     else:
-        pass#resampled_image = nii  # Default to the original image if not resampling
+        pass
     
     if 'resampled_image' in what_to_return:
         to_be_returned['resampled_image'] = resampled_image
@@ -41,44 +49,56 @@ def preprocess_pipeline(file_path, steps_to_take: list, what_to_return: list):
     if 'normalize' in steps_to_take:
         normalized_image = normalize_data(resampled_image)
     else:
-        pass#normalized_image = resampled_image  # Use resampled image if no normalization
+        pass
     
     if 'normalized_image' in what_to_return:
         to_be_returned['normalized_image'] = normalized_image
 
     # Brain extraction
     if 'extract_brain' in steps_to_take:
-        brain_data = extract_brain(normalized_image, what_to_return={'extracted_brain': 'numpy', 'mask': 'numpy'})
+        if separation:
+            brain_data = extract_brain(resampled_image, what_to_return={'extracted_brain': 'numpy', 'mask': 'numpy'})
+        else:
+            brain_data = extract_brain(normalized_image, what_to_return={'extracted_brain': 'numpy', 'mask': 'numpy'})
         extracted_brain = brain_data['extracted_brain']
         mask = brain_data['mask']
     else:
-        pass#extracted_brain = normalized_image  # Default if no extraction
         mask = None
     
     if 'extracted_brain' in what_to_return:
         to_be_returned['extracted_brain'] = extracted_brain
 
     # Cropping
-    if 'crop' in steps_to_take and mask is not None:
-        cropped_image = crop_to_largest_bounding_box(extracted_brain, mask=mask)
+    if 'crop' in steps_to_take:
+        if separation:
+            brain_data = extract_brain(resampled_image, what_to_return={'mask': 'numpy'})
+            mask = brain_data['mask']
+            cropped_image = crop_to_largest_bounding_box(resampled_image, mask=mask)
+        else:    
+            cropped_image = crop_to_largest_bounding_box(brain_data, mask=mask)
     else:
-        pass#cropped_image = extracted_brain  # Use extracted brain if no cropping
+        pass
     
     if 'cropped_image' in what_to_return:
         to_be_returned['cropped_image'] = cropped_image
 
     # Smoothing
     if 'smooth' in steps_to_take:
-        smoothed_image = apply_gaussian_smoothing(cropped_image, sigma=0.5, order=0, mode='reflect', cval=0, truncate=3.0)
+        if separation:
+            smoothed_image = apply_gaussian_smoothing(resampled_image, sigma=0.5, order=0, mode='reflect', cval=0, truncate=3.0)
+        else:    
+            smoothed_image = apply_gaussian_smoothing(cropped_image, sigma=0.5, order=0, mode='reflect', cval=0, truncate=3.0)
     else:
-        pass#smoothed_image = cropped_image  # Use cropped image if no smoothing
+        pass
     
     if 'smoothed_image' in what_to_return:
         to_be_returned['smoothed_image'] = smoothed_image
 
     # Normalize smoothed image
     if 'normalize_smoothed' in steps_to_take:
-        smoothed_normalized_image = normalize_data(smoothed_image)
+        if separation:
+            smoothed_image = apply_gaussian_smoothing(resampled_image, sigma=0.5, order=0, mode='reflect', cval=0, truncate=3.0)
+        smoothed_normalized_image = normalize_data(smoothed_image)    
     else:
         pass#smoothed_normalized_image = smoothed_image  # Use smoothed image if no normalization
 
@@ -96,11 +116,18 @@ def load_pt_file(pt_file_path):
 if __name__ == '__main__':
     # Paths
     path_to_data = 'data'
-    output_dir = 'data/processed'
+    output_dir = 'data/processed/separated'
     os.makedirs(output_dir, exist_ok=True)
 
     # Steps to take
-    steps_to_take = ['resample', 'normalize', 'extract_brain', 'crop', 'smooth', 'normalize_smoothed']
+    steps_to_take = [
+        'resample', 
+        #'normalize', 
+        'extract_brain', 
+        'crop', 
+        #'smooth', 
+        #'normalize_smoothed'
+        ]
 
     # Outputs to save
     what_to_return = [
@@ -109,7 +136,7 @@ if __name__ == '__main__':
                         'extracted_brain', 
                         'cropped_image', 
                         #'smoothed_image', 
-                        'smoothed_normalized_image'
+                        #'smoothed_normalized_image'
                         ]
 
     # Process files
@@ -130,7 +157,7 @@ if __name__ == '__main__':
 
                 # Save data as a PyTorch tensor
                 pt_file_path = os.path.join(save_dir, f"{os.path.splitext(file)[0]}.pt")
-                torch.save(torch.tensor(data), pt_file_path)
+                torch.save(torch.tensor(data, dtype=torch.float32), pt_file_path)
                 print(f"Saved: {pt_file_path}")
             
             counter += 1
@@ -140,23 +167,3 @@ if __name__ == '__main__':
             #if counter == 1:
             #    break
     #
-    '''pt_file_path_extracted_brain = 'data/processed/extracted_brain/sub-A00023143_ses-20090101_acq-mprage_run-01_T1w.nii.pt'
-    loaded_tensor = load_pt_file(pt_file_path_extracted_brain)
-    print(f"Loaded tensor shape: {loaded_tensor.shape}")
-    # Plot the loaded file, convert to numpy array
-    loaded_np = loaded_tensor.numpy()
-    plt.imshow(loaded_np[:,:,140], cmap='gray')
-    plt.show()
-
-    pt_file_path_smoothed_norm = 'data/processed/smoothed_normalized_image/sub-A00023143_ses-20090101_acq-mprage_run-01_T1w.nii.pt'
-    loaded_tensor = load_pt_file(pt_file_path_smoothed_norm)
-    loaded_np = loaded_tensor.numpy()
-    plt.imshow(loaded_np[:,:,140], cmap='gray')
-    plt.show()
-
-    nii_file_path = 'data/sub-A00023143_ses-20090101_acq-mprage_run-01_T1w.nii.gz'
-    loaded_nii = load_nii(nii_file_path)
-    loaded_data = get_data(loaded_nii)
-    plt.imshow(loaded_data[:,:,140], cmap='gray')
-    plt.show()'''
-    
