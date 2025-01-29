@@ -6,81 +6,52 @@ from torch.utils.data import Dataset
 from src.utils.preprocess import load_nii, preprocess_image
 
 class MRIDataset(Dataset):
-    def __init__(self, data_path, transform=None):
-        """
-        Custom Data Loader to load MRI data and labels.
-
-        Args:
-            data_path (str): Path to the top-level "data" folder.
-            transform (callable, optional): A function/transform to apply to the images.
-        """
-        self.data_path = data_path
+    def __init__(self, image_paths, labels_file, target_shape=(192, 256, 256), transform=None):
+        self.image_paths = image_paths
+        self.labels_file = labels_file
+        self.target_shape = target_shape
         self.transform = transform
-        self.file_paths, self.labels = self._load_data_and_labels()
 
-    def _load_data_and_labels(self):
-        """
-        Load all .nii.gz file paths and their corresponding labels based on CSV files.
-        
-        Returns:
-            file_paths (list): List of paths to .nii.gz files.
-            labels (list): List of labels (0 or 1) corresponding to each file (each subject).
-        """
-        file_paths = []
-        labels = []
-
-        # Iterate over COBRE and MCICShare folders
-        for dataset_name in ["COBRE", "MCICShare"]:
-            dataset_full_name = "schizconnect_" + dataset_name + "_images" + "_22613"
-            dataset_path = os.path.join(self.data_path, dataset_full_name, dataset_name)
-            csv_path = os.path.join(dataset_path, "participants.csv")
-
-        # Load participant mapping from CSV
-        participants_df = pd.read_csv(csv_path)
-        participants_df.set_index(participants_df["participant_id"].str.replace("sub-", "", regex=False), inplace=True)
-
-        # Find all .nii.gz files in the anat subfolder
-        anat_files = glob.glob(os.path.join(dataset_path, "sub-*", "ses-*", "anat", "*.nii.gz"))
-
-        for file_path in anat_files:
-            # Extract subject ID (e.g., "A00000300" from "sub-A00000300")
-            subject_id = os.path.basename(file_path).split("_")[0].replace("sub-", "")
-
-            # Retrieve the label (0 or 1) from the CSV
-            if subject_id in participants_df.index:
-                label = participants_df.loc[subject_id, "dx_encoded"]
-                file_paths.append(file_path)
-                labels.append(label)
-            else: # TODO: collect subjects with wrong labels or mismatches?
-                print(f"Warning: No label found for {subject_id} in {csv_path}")
-
-        return file_paths, labels    
+        # Load the labels from CSV
+        self.labels_df = labels_file
 
     def __len__(self):
-        return len(self.file_paths)
+        return sum(self.target_shape[0] for _ in self.image_paths)  # Total number of slices
 
     def __getitem__(self, idx):
-        """
-        Get an image and its corresponding label.
+      file_index = idx // self.target_shape[0]
+      slice_index = idx % self.target_shape[0]
+      file_path = self.image_paths[file_index]
 
-        Args:
-            idx (int): Index of the sample.
+      subject_label_cache = {}
+      subject_number = extract_subject_number(file_path)
 
-        Returns:
-            image (torch.Tensor): Preprocessed MRI image.
-            label (int): Corresponding label (0 or 1).
-        """
-        file_path = self.file_paths[idx]
-        label = self.labels[idx]
+      label_row = self.labels_df[self.labels_df["participant_id"] == subject_number]
+      if label_row.empty:
+          logging.warning(f"No label found for subject: {subject_number}")
+          raise ValueError(f"Missing label for subject: {subject_number}")  # Raise error instead of returning None
+      label = label_row["dx_encoded"].values[0]
 
-        # Load and preprocess the image
-        image = load_nii(file_path)
-        image = preprocess_image(image)
+      try:
+          img = nib.load(file_path)
+          # Apply transformation if specified
+          if self.transform:
+              img_data = transform_nifti.resample_image(img)
+              img_data = transform_nifti.normalize_data(img_data)
 
-        # Apply the transformations if provided
-        if self.transform:
-            image = self.transform(image)
-        else:
-            image = torch.from_numpy(image).float()  # Convert back to tensor conversion if no transform
-    
-        return image, label
+          if img_data.shape != self.target_shape:
+              if sorted(img_data.shape) == sorted(self.target_shape):
+                  permuted_axes = np.argsort(img_data.shape)
+                  img_data = np.transpose(img_data, permuted_axes)
+              else:
+                  pass
+              img_data = resize(img_data, self.target_shape, mode="constant", preserve_range=True)
+
+          slice_2d = img_data[slice_index, :, :]
+          slice_2d = torch.tensor(slice_2d, dtype=torch.float32).unsqueeze(0)  # Add channel dimension
+
+      except Exception as e:
+          logging.error(f"Error loading file {file_path}: {e}")
+          raise RuntimeError(f"Error processing file {file_path}: {e}")  # Raise error instead of returning None
+
+      return slice_2d, label
