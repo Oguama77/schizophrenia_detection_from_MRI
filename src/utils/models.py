@@ -6,11 +6,7 @@ from sklearn.model_selection import GridSearchCV
 from sklearn.pipeline import make_pipeline
 from sklearn.svm import SVC
 
-
-
-
 # ResNet-18 for Feature Extraction
-
 class FeatureExtractor(nn.Module):
     def __init__(self, base_model_name='resnet18', weights=models.ResNet18_Weights.IMAGENET1K_V1, input_channels=1):
         super(FeatureExtractor, self).__init__()
@@ -36,6 +32,6 @@ class FeatureExtractor(nn.Module):
         return x.view(x.size(0), -1)  # Flatten to (batch_size, feature_dim)
     
 # Support Vector Classifier for image classification
-
 svm_classifier = make_pipeline(StandardScaler(), 
                                SVC(kernel='rbf', probability=True, C= 100, gamma= 0.0001, random_state=42))
+
