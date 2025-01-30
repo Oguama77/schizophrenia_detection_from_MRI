@@ -1,4 +1,4 @@
-# Schizo
+# Schizophrenia Detection from MR images
 
 ## Project Data:
 Link to project's raw data (first input)
