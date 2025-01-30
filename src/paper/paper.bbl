@@ -1,0 +1,27 @@
+\begin{thebibliography}{1}
+
+\bibitem{Benli2023}
+S.~Gengec~Benli and M.~Andac.
+\newblock Constructing the schizophrenia recognition method employing glcm
+  features from multiple brain regions and machine learning techniques.
+\newblock {\em Diagnostics}, 13(13), 2023.
+
+\bibitem{Oh2020}
+J.~Oh, B.-L. Oh, K.-U. Lee, J.-H. Chae, and K.~Yun.
+\newblock Identifying schizophrenia using structural mri with a deep learning
+  algorithm.
+\newblock {\em Frontiers in Psychiatry}, 11, 2020.
+
+\bibitem{Verma2023}
+S.~Verma, T.~Goel, M.~Tanveer, W.~Ding, R.~Sharma, and R.~Murugan.
+\newblock Machine learning techniques for the schizophrenia diagnosis: A
+  comprehensive review and future research directions, 2023.
+
+\bibitem{Zhang2022}
+J.~Zhang, V.~Rao, Y.~Tian, Y.~Yang, N.~Acosta, Z.~Wan, P.-Y. Lee, C.~Zhang,
+  L.~Kegeles, S.~Small, and J.~Guo.
+\newblock Detecting schizophrenia with 3d structural brain mri using deep
+  learning.
+\newblock 06 2022.
+
+\end{thebibliography}
