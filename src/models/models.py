@@ -1,4 +1,3 @@
-# Import libraries
 import torch
 import torch.nn as nn
 from torchvision import models
@@ -34,6 +33,7 @@ class FeatureExtractor(nn.Module):
     
 # Support Vector Classifier for image classification
 def vector_classifier():
+    # Values are hardcoded after a grid search
     svm_classifier = make_pipeline(StandardScaler(), 
                                SVC(kernel='rbf', probability=True, C= 100, gamma= 0.0001, random_state=42))
     return svm_classifier

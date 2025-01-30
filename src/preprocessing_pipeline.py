@@ -122,9 +122,9 @@ if __name__ == '__main__':
     # Steps to take
     steps_to_take = [
         'resample', 
-        #'normalize', 
-        'extract_brain', 
-        'crop', 
+        'normalize', 
+        #'extract_brain', 
+        #'crop', 
         #'smooth', 
         #'normalize_smoothed'
         ]
@@ -132,9 +132,9 @@ if __name__ == '__main__':
     # Outputs to save
     what_to_return = [
                         #'resampled_image',
-                        #'normalized_image',
-                        'extracted_brain', 
-                        'cropped_image', 
+                        'normalized_image',
+                        #'extracted_brain', 
+                        #'cropped_image', 
                         #'smoothed_image', 
                         #'smoothed_normalized_image'
                         ]

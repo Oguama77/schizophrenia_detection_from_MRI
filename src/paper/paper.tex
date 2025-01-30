@@ -26,19 +26,11 @@
 % Introduction
 \section{Introduction}
 
-Schizophrenia (SZ) is a chronic mental disorder affecting 1 in 300 people worldwide~\cite{Zhang2022} (Harestad, 2024), characterized by disruptions in thought processes, perception, and social functioning. Accurate and timely diagnosis is crucial for effective management, yet schizophrenia remains one of the most challenging disorders to diagnose due to its heterogeneity and overlap with other psychiatric conditions (Joyee et al,; Benlee and Adac). Being linked to structural and functional brain abnormalities, SZ has been actively studied using Magnetic Resonance Imaging (MRI). Structural MRI has contributed to our understanding of the neural basis of SZ, highlighting abnormalities such as ventricular enlargement, gray and white matter alterations, frontal cortex enlargement, and cortical thickness (Joyee et al.; Teskera and Bozek.,2023).
+Schizophrenia (SZ) is a chronic mental disorder affecting 1 in 300 people worldwide, linked to structural brain abnormalities observable via MRI. Machine learning (ML) and deep learning (DL) have advanced SZ diagnosis, yet variability in preprocessing methods—such as noise removal and intensity normalization—remains a major challenge~\cite{Benli2023, Zhang2022}.
 
-%neuroimaging has emerged as a powerful tool for identifying biomarkers associated with schizophrenia. 
+Despite progress in CNN-based SZ detection, studies often lack standardized preprocessing pipelines, impacting model reliability and reproducibility. Benchmark datasets [REFS!!!] report high classification accuracies, but inconsistent preprocessing limits comparability.
 
-The advent of machine learning (ML) and deep learning (DL) techniques has further accelerated efforts to automate schizophrenia diagnosis by analyzing complex neuroimaging data.
-
-Despite the significant progress in developing convolutional neural network (CNN) architectures for schizophrenia detection [REFS!!!], a critical challenge persists: the lack of standardization in preprocessing and feature extraction pipelines. Variability in preprocessing methods---such as noise removal, intensity normalization, and artifact correction---introduces inconsistencies in model training and evaluation.
-
-Existing literature primarily emphasizes developing DL models, often neglecting to explicitly detail the preprocessing steps applied to the neuroimaging data. This gap is particularly concerning, as preprocessing directly impacts the quality and reliability of input data, influencing downstream analyses and model performance. Studies leveraging benchmark datasets,[REFS!!!] such as BrainGluSchi, COBRE, MCICShare, NMorphCH, and NUSDAST frequently report high classification accuracies, but the preprocessing pipelines remain inadequately documented or inconsistent, further complicating efforts to replicate findings.
-
-%Similarly, differences in feature extraction techniques hinder the interpretability and generalizability of machine learning outputs, as they may target inconsistent brain regions or utilize diverse spatial features. These issues contribute to variability in reported results across studies, limiting reproducibility and comparability.
-
-To address these challenges, this project aims to systematically experiment with various preprocessing techniques commonly used in medical imaging, such as contrast enhancement, noise removal, and data augmentation. By evaluating their impact on schizophrenia detection from MR images, we seek to propose a robust and reproducible preprocessing pipeline. Standardizing preprocessing practices could enhance the reproducibility of ML-based schizophrenia diagnostics, ultimately contributing to more reliable and clinically applicable models.
+This project systematically evaluates preprocessing techniques (e.g., contrast enhancement, noise removal) to establish a robust pipeline for SZ detection from MRI. Standardizing these practices could improve the reproducibility and clinical applicability of ML-based diagnostics.
 
 % Methods
 \section{Methods}
@@ -52,16 +44,6 @@ The data obtained originates from the Center of Biomedical Research Excellence (
 The data from SchizConnect was filtered based on MRI field strength and clinical diagnosis. We retrieved only images captured with 3T MRI scans. This was done to ensure uniformity of the data obtained.
 
 Clinical data was made available in form of CSV files. The demographic features of the dataset used in this project are presented in Table~\ref{tab:cobre_clinical_demographic}.
-%Figure~\ref{fig:demographic_features} shows the age and gender distribution.
-
-%\begin{figure}[h]
-%    \centering
-%    \includegraphics[width=0.4\textwidth]{./figs/demographic_features.png}
-%    \caption{Demographic features of the COBRE dataset.}\label%{fig:demographic_features}
-%\end{figure}
-
-% Figs should not duplicate the tables and vice versa
-
 \begin{center}
 	\begin{table}
         \centering
@@ -91,7 +73,7 @@ We experimented with different combinations of preprocessing and data augmentati
 
 In order to find the best combination of hyperparameters for each preprocessing method, we performed a grid search and measured the quality metrics of the processed image using a custom test function.
 
-Table~\ref{tab:preprocessing_pipeline} and Table~\ref{tab:augmentation_pipeline} present the preprocessing and augmentation techniques respectively used and their respective hyperparameters and tools used. Figure~\ref{fig:test_pipeline} gives a visual representation of the conducted tests.
+Table~\ref{tab:preprocessing_pipeline} presents the preprocessing techniques used and their respective hyperparameters and tools used. Figure~\ref{fig:test_pipeline} gives a visual representation of the conducted tests.
 %
 \begin{figure}[h]
     \centering
@@ -122,10 +104,6 @@ The third step of the pipeline is a brain extraction. The purpose of this stage 
 
 The generated brain mask was refined by closing gaps and removing small regions. The mask was also used as a leverage for the cropping step.
 
-% Discuss When Brain Extraction May Not Be Necessary
-
-%The nobrainer tool offers pre-trained deep learning models for brain extraction and is designed for robust performance on diverse datasets.ANTsPyNet is a Python library that offers neural network architectures and pre-trained models for medical image analysis, including brain extraction.
-
 \subsubsection{Cropping}
 
 The fourth step of the pipeline is cropping the brain region to a consistent size across scans.
@@ -148,7 +126,6 @@ Relative PSNR for one image. Using a hypothetical "ideal" signal (the maximum in
 A binary mask was computed using Otsu's thresholding to explicitly select a background region for noise estimation.
 
 The metrics were computed for the entire 3D volume to assess the overall quality or similarity of the entire MRI dataset, capturing global differences.
-%
 \begin{center}
     \begin{table}
         \centering
@@ -157,139 +134,120 @@ The metrics were computed for the entire 3D volume to assess the overall quality
             \toprule
             \textbf{Preprocessing Step} & \textbf{Hyperparameters} & \textbf{Tools} \\
             \midrule
-            Resampling & Voxel size: 1mm & Nibabel library \\
+            Resampling & Voxel size: \texttt{2x2x2} & Nibabel library \\
             Intensity Normalization & Min-max scaling: [0, 1] & NumPy \\
             Brain Extraction & Modality: T1, U-net & ANTsPyNet \\
             Cropping & Size: based on the largest bounding box among all images & scikit-image, NumPy \\
-            Smoothing & Gaussian filter: sigma=1.5 & SciPy \\
+            Smoothing & Gaussian filter: sigma=0.5 & SciPy \\
             \bottomrule
             \end{tabular*}
     \end{table}
 \end{center}
-% Discuss Metrics for Each 2D Slice (Slice-wise Approach):
 %
 \subsection{Data Augmentation}
 
 According to typical variations in brain MRI scans, the following transformations with corresponding parameters were applied to the images:
 \begin{itemize}
-    \item[\textbf{Option 1}]  \textbf{Shearing.} A shearing angle is selected randomly within the range $\left[-15^{\circ}, 15^{\circ}\right]$ and A shearing operation is applied within the x and y-axis. This operation is repeated 10 times with 10 different shearing angles. By this method, 10 images are generated from an original image;
-    \item[\textbf{Option 2}] \textbf{Rotation.} Rotation angles are selected randomly within the range  $\left[-25^{\circ}, 25^{\circ}\right]$ and clockwise rotations are applied using 10 different angle values. 10 images are generated from an original image by this method.
-    \item[\textbf{Option 3}] \textbf{Gaussian noise addition.} Noise addition is applied by \mbox{$I=I+R*std+mean$}. The noise to be added is generated using a Gaussian distribution. The variance of the distribution is computed from the input images while the mean value is set to zero. In this study, three different fixed values (0.3, 0.4, and 0.5) are used and 3 images are generated from an input image.
-    \item[\textbf{Option 4}] \textbf{Gaussian noise addition followed by rotation.} 30 images are generated from an input image by this method.
-    \item[\textbf{Option 5}] \textbf{Clockwise rotation followed by translation.} Rotation angles are selected randomly within the range $\left[-25^{\circ}, 25^{\circ}\right]$ and translation is applied on the x and y-axis by using different values sampled randomly within the range $\left[-15^{\circ}, 15^{\circ}\right]$. This successive operation is applied 10 times, and 10 images are generated from an input image by this method.
-    \item[\textbf{Option 6}] \textbf{Translation followed by shearing.} The translation step is applied on the x and y-axis with different values sampled randomly within the range $\left[-15, 15\right]$. In the shearing step, an angle is selected randomly within the range $\left[-15^{\circ}, 15^{\circ}\right]$, and shearing is applied within the x and y-axis. The subsequent operations are applied 10 times, and 10 images are generated from an input image by this method.
-    \item[\textbf{Option 7}] \textbf{Translation, shearing, and rotation.} Operations are applied subsequently. Implementation of the translation and shearing operations are performed as explained in the previous method. In the rotation step, a random angle is selected within the range $\left[-25^{\circ}, 25^{\circ}\right]$ clockwise rotation is applied. The successive operations are applied 10 times, and 10 images are generated from an input image by this method.
+    %\item[\textbf{Option 1}]  \textbf{Shearing.} A shearing angle is selected randomly within the range $\left[-15^{\circ}, 15^{\circ}\right]$ and A shearing operation is applied within the x and y-axis. This operation is repeated 10 times with 10 different shearing angles. By this method, 10 images are generated from an original image;
+    \item[\textbf{Option 1}] \textbf{Translation}. The operation is applied on the x and y-axis and repeated 10 times by using different values sampled randomly within the range $\left[-10, 10\right]$. By this method, 10 images are generated from an original image.
+    \item[\textbf{Option 2}] \textbf{Rotation.} Rotation angles are selected randomly within the range  $\left[-10^{\circ}, 10^{\circ}\right]$ and clockwise rotations are applied using 10 different angle values. 10 images are generated from an original image by this method.
+    \item[\textbf{Option 3}] \textbf{Gaussian noise addition.} Noise addition is applied by \mbox{$I=I+R*I*std+mean$}, where $I$ refers to the image, $R$ refers to the Noise. The noise to be added is generated using a Gaussian distribution. The variance of the distribution is computed from the input images while the mean value is set to zero. In this study, three different fixed values (0.1, 0.2, and 0.3) are used and 3 images are generated from an input image.
+    %\item[\textbf{Option 4}] \textbf{Gaussian noise addition followed by rotation.} 30 images are generated from an input image by this method.
+    %\item[\textbf{Option 5}] \textbf{Clockwise rotation followed by translation.} Rotation angles are selected randomly within the range $\left[-25^{\circ}, 25^{\circ}\right]$ and translation is applied on the x and y-axis by using different values sampled randomly within the range $\left[-15^{\circ}, 15^{\circ}\right]$. This successive operation is applied 10 times, and 10 images are generated from an input image by this method.
+    %\item[\textbf{Option 6}] \textbf{Translation followed by shearing.} The translation step is applied on the x and y-axis with different values sampled randomly within the range $\left[-15, 15\right]$. In the shearing step, an angle is selected randomly within the range $\left[-15^{\circ}, 15^{\circ}\right]$, and shearing is applied within the x and y-axis. The subsequent operations are applied 10 times, and 10 images are generated from an input image by this method.
+    %\item[\textbf{Option 7}] \textbf{Translation, shearing, and rotation.} Operations are applied subsequently. Implementation of the translation and shearing operations are performed as explained in the previous method. In the rotation step, a random angle is selected within the range $\left[-25^{\circ}, 25^{\circ}\right]$ clockwise rotation is applied. The successive operations are applied 10 times, and 10 images are generated from an input image by this method.
 \end{itemize}
 
-%Experimentation: Start with conservative parameters (e.g., small rotations, flips) and gradually expand based on model performance.
-
 The augmented samples were plotted to ensure the transformations don't distort anatomical features.
-\begin{center}
-    \begin{table}
-        \centering
-        \caption{\label{tab:augmentation_pipeline}Augmentation techniques used in the study.}
-        \begin{tabular*}{500pt}{@{\extracolsep\fill}lcc@{\extracolsep\fill}}
-            \toprule
-            \textbf{Augmentation Step} & \textbf{Hyperparameters} & \textbf{Tools} \\
-            \midrule
-            Rotation & Angle (degrees): 20 & torchvision \\
-            Blurring & Sigma: ...  & NumPy \\
-            Noise & Noise (std): ... & ANTsPyNet \\
-            \bottomrule
-            \end{tabular*}
-    \end{table}
-\end{center}
-%
-%1st Method In this method, a shearing angle, which is selected randomly within the range [− 15°, 15°], is used and a shearing operation is applied within the x and y-axis. This operation is repeated 10 times with 10 different shearing angles. By this method, 10 images are generated from an original image.
-
-%3rd Method Rotation angles are selected randomly within the range [− 25°, 25°] and clockwise rotations are applied using 10 different angle values. 10 images are generated from an original image by this method.
-
-%7th Method In this method, augmentation is provided by Gaussian noise addition (4th method) followed by rotation (3rd method). 30 images are generated from an input image by this method
-
-%8th Method In this augmentation method, clockwise rotation and then translation operations are applied. Rotation angles are selected randomly within the range [− 25°, 25°] and translation is applied on the x and y-axis by using different values sampled randomly within the range [− 15, 15]. This successive operation is applied 10 times, and 10 images are generated from an input image by this method.
-
-%9th Method In this method, translation is applied followed by the shearing. The translation step is applied on the x and y-axis with different values sampled randomly within the range [− 15, 15]. In the shearing step, an angle is selected randomly within the range [− 15°, 15°], and shearing is applied within the x and y-axis. The subsequent operations are applied 10 times and 10 images are generated from an input image by this method.
-
-%10th Method In this method, three operations (translation, shearing, and rotation) are applied subsequently. Implementation of the translation and shearing operations are performed as explained in the 9th method. In the rotation step, a random angle is selected within the range [− 25°, 25°] clockwise rotation is applied. The successive operations are applied 10 times, and 10 images are generated from an input image by this method.
-
-\begin{comment}
-    Here are some common transformations you can apply to your MRI images, tailored to medical imaging:
-a. Flips
-Horizontal Flip (RandomHorizontalFlip): Good for brain MRI images, as the brain is symmetric along the sagittal plane.
-Vertical Flip (RandomVerticalFlip): Less commonly used, but still possible, depending on the orientation of your images.
-b. Rotations
-RandomRotation: Useful for handling minor variations in patient positioning during scans.
-Angle Range: Typically, 10°–30° is sufficient. Avoid large angles (>45°), as they may produce unrealistic data.
-
-c. Random Affine Transform
-Includes translation, scaling, rotation, and shear.
-Translation: Small translations (e.g., up to 10\% of image size) simulate minor misalignments.
-Scaling: Scale variations between 0.9x and 1.1x are typical.
-Shear: Small shearing angles (e.g., ±10°) can add variety.
-d. Intensity-Based Augmentations
-RandomBrightness or RandomGamma: Simulates variations in scan intensity due to different machines or settings.
-Gaussian Noise: Adds noise to simulate variations or imperfections in the imaging process.
-
-f. Cropping and Resizing
-Center cropping or random cropping to extract relevant parts of the brain.
-Resize all images to a fixed size (e.g., (128, 128, 128) or (256, 256, 256)) for consistency.
-
-Brightness and Contrast: Adjusting these properties can simulate variations in scanner settings, but it must be done carefully. Too much adjustment may distort the structural information critical for your task.
-
-For MRI images, adding noise or slight intensity shifts is a more domain-specific way to introduce variation:
-\end{comment}
 
 %
 \subsection{Model architectures}
 
-Convolutional Neural Networks (CNNs) are commonly used in the literature for this task [REFS!!]. However, a few papers explored the use of support vector machines for image classification [REFS!!]. To gain a full understanding of both approaches, we decided on the combination of a pretrained deep neural network for feature extraction and a support vector classifier for binary classification. The ReNet-18 architecture was selected for its balance between computational load and accuracy. Cross validation was performed with the support vector classifier to choose the best hyperparameters, and the hyperparameters that yielded the best results were the radial basis function (RBF) kernel, a gamma value of 0.0001 and a C parameter value of 100. Each 2D slice of the images were fed into the ResNet-18 model as NumPy arrays of dimension $224x224$. This input size corresponds to the size of the images in the ImageNet dataset that was used to train ResNet-18 and was selected for compatibility with the pretrained weights of the ResNet-18 model. Figure~\ref{fig:training_architecture} gives a representation of the training architecture and flow.
+Convolutional Neural Networks (CNNs) are commonly used in the literature for this task [REFS!!]. However, a few papers explored the use of support vector machines for image classification [REFS!!]. To gain a full understanding of both approaches, we decided on the combination of a pretrained deep neural network for feature extraction and a support vector classifier for binary classification. The ReNet-18 architecture was selected for its balance between computational load and accuracy. Cross validation was performed with the support vector classifier (SVC) to choose the best hyperparameters, and the hyperparameters that yielded the best results were the radial basis function (RBF) kernel, a gamma value of 0.0001 and a C parameter value of 100. Each 2D slice of the images were fed into the ResNet-18 model as NumPy arrays of dimension $224x224$. This input size corresponds to the size of the images in the ImageNet dataset that was used to train ResNet-18 and was selected for compatibility with the pretrained weights of the ResNet-18 model. Figure~\ref{fig:training_architecture} gives a representation of the training architecture and flow.
 %
 \begin{figure}
     \centering
-    \includegraphics[width=0.4\textwidth]{./figs/empty.pdf} % training_architecture.png
+    \includegraphics[width=0.4\textwidth]{./figs/model_architecture.png} % training_architecture.png
     \caption{Training architecture and flow.}\label{fig:training_architecture}
 \end{figure}
 
 %
-\subsection{CNN validation}
+\subsection{Training and validation}
+
+The dataset was split into a training set (80\%) and a validation set (20\%). 
+
+Accuracy, recall, precision, and F1-score were calculated to asses the performance of the SVC.
 
 % Results
 \section{Results}
 
 \subsection{Image Preprocessing}
 
-An SNR greater than 1 means that the average signal is more intense than the noise.
+The results presented in Table~\ref{tab:model_metrics_preprocessing} demonstrate the impact of various preprocessing methods on classification performance. The baseline model using raw images (0) achieved an accuracy of 0.51, with an F1-score of 0.63. Applying resampling (1) alone did not alter these results, suggesting that resampling alone does not introduce substantial benefits.
 
-MRI SNR Values
-For MRI, typical SNR values in literature are often much higher than 1:
-Clinical MRIs: SNR values between 10–40 for good-quality scans.
-Research MRIs: Values can exceed 50 or even 100 in highly optimized settings.
-Values below 10 may indicate noisy or poor-quality scans.
+Normalization (2) improved accuracy to 0.56 and F1-score to 0.67, indicating that standardizing intensity values enhances model performance. Brain extraction (3) yielded a slightly lower accuracy (0.54) but a notable increase in recall (0.78), which suggests that removing non-brain tissues helps capture more positive instances but may introduce a trade-off in precision.
 
-PSNR Behavior:
-PSNR should be higher when the image quality is better, which typically results in a greater difference between the actual data and the ideal reference.
-If you have well-normalized data and a clean signal with little noise, PSNR will naturally be higher because it’s measuring how close the data is to an ideal version of the image.
-Expected Value Ranges:
-SNR values typically range between 10 and 40 for good quality MRI images.
-PSNR values, when properly calculated, can be much higher because they consider an ideal signal. For instance, PSNR values between 20 and 50 dB are common, but they depend heavily on image resolution, noise, and contrast.
+Cropping (4) led to the highest accuracy (0.57) and an F1-score of 0.69, highlighting its effectiveness in improving signal-to-noise ratio. Smoothing (5) showed a moderate impact, improving results compared to the raw data but not outperforming other methods.
 
-How to Interpret These Results:
-SNR = 100: Indicates that the image has a strong signal relative to noise. This is expected after smoothing because smoothing reduces noise.
-PSNR = 45: Indicates that the smoothed image differs moderately from the original. This suggests the smoothing process significantly altered the pixel intensities.
+When combining preprocessing techniques, the pattern is less straightforward. The combination of resampling, normalization, and brain extraction (1+2+3) resulted in the highest recall (0.80) while maintaining a strong F1-score (0.69). However, adding cropping (1+2+3+4) caused a drastic performance drop, with accuracy declining to 0.44 and F1-score to 0.54. The full pipeline (1+2+3+4+5) slightly improved over this but still underperformed compared to individual preprocessing steps.
+\begin{center}
+	\begin{table}[t]
+		\centering
+		\caption{\label{tab:model_metrics_preprocessing}Desct}
+		\begin{tabular*}{500pt}{@{\extracolsep\fill}lcccc@{\extracolsep\fill}}
+			\toprule
+		     \textbf{Preprocessing method} &\textbf{Accuracy} &  \textbf{Recall} &\textbf{Precision} &\textbf{F1-score}\\
+			\midrule
+			Raw (0) & 0.51 & 0.67 & 0.60 & 0.63 \\
+			Resampling (1) & 0.51 & 0.67 & 0.60 & 0.63 \\
+			Normalization (2) & 0.56 & 0.69 & 0.64 & 0.67 \\
+			Brain extraction (3) & 0.54 & 0.78 & 0.60 & 0.68 \\
+			Cropping (4) & 0.57 & 0.76 & 0.63 & 0.69 \\
+			Smoothing (5) & 0.55 & 0.71 & 0.62 & 0.66 \\
+            1+2 & 0.56 & 0.76 & 0.57 & 0.65 \\
+            1+2+3 & 0.55 & 0.80 & 0.61 & 0.69 \\
+            1+2+3+4 & 0.44 & 0.53 & 0.56 & 0.54 \\
+            1+2+3+4+5 & 0.48 & 0.60 & 0.58 & 0.59 \\
+			\bottomrule
+		\end{tabular*}
+	\end{table}
+\end{center}
 
 \subsection{Data Augmentation}
 
-\subsection{CNN performance}
-
-% Random text
-\lipsum[5-6]
+According to the results, Table~\ref{tab:model_meetrics_augmentation}
+\begin{center}
+	\begin{table}[t]
+		\centering
+		\caption{\label{tab:model_meetrics_augmentation}Desct}
+		\begin{tabular*}{500pt}{@{\extracolsep\fill}lcccc@{\extracolsep\fill}}
+			\toprule
+			\textbf{Augmentation method} &\textbf{Accuracy} &  \textbf{Recall} &\textbf{Precision} &\textbf{F1-score}\\
+			\midrule
+			Raw (0) & 0.51 & 0.67 & 0.60 & 0.63 \\
+			Translation (1) & 0.75 & 0.84 & 0.74 & 0.79 \\
+			Rotation (2) & 0.79 & 0.81 & 0.78 & 0.80 \\
+			Gaussian Noise (3) & 0. & 0. & 0. & 0. \\
+			\bottomrule
+		\end{tabular*}
+	\end{table}
+\end{center}
 
 % Discussion
 \section{Discussion}
 
+This study investigated...
+
+These results suggest that while certain preprocessing steps (e.g., normalization, brain extraction, and cropping) contribute positively when applied individually, combining them does not necessarily yield additive benefits. Over-processing may introduce distortions that hinder model generalization.
+
 The methods used for brain MR image augmentation have some limitations or drawbacks. For instance, in a study (Isensee et al. 2020), the augmentation approach uses elastic deformations, which add shape variations. However, the deformations can bring lots of damage and noise when the deformation field is varied seriously. Also, the generated images seem not to be realistic and natural. It has been shown in the literature that widely used elastic deformations produce unrealistic brain MR images (Mok and Chung 2018).
 
 augmentation with the combination of shearing and salt-and-pepper noise addition is the least efficient approach for augmentation in improving classification performance 
+
+% Discuss When Brain Extraction May Not Be Necessary
+
+% Discuss Metrics for Each 2D Slice (Slice-wise Approach):
+
 
 % Conclusion
 \section{Conclusion}
@@ -318,5 +276,14 @@ The authors report no financial disclosure.
 \subsection*{Conflict of interest}
 
 The authors declare no potential conflict of interests.
+
+\renewcommand{\baselinestretch}{1.5} % Полуторный межстрочный интервал
+%\singlespacing
+%\renewcommand\bibname{Bibliography}
+\bibliographystyle{abbrv} %abbrv
+\phantomsection     % для корректных ссылок на
+\cleardoublepage    % библиографию
+\bibliography{paper}
+
 
 \end{document}
