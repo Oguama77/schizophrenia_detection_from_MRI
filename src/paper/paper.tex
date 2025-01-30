@@ -9,19 +9,19 @@
 \section{Abstract}
 
 \textbf{Background}\\
-\lipsum[1]
-\textbf{Aim}: ...
+Schizophrenia (SZ) is a chronic mental disorder that presents challenges in accurate diagnosis due to its complex nature. Advances in machine learning (ML) and deep learning (DL) have shown promise in automating SZ detection using structural MRI, but variability in preprocessing methods remains a key challenge.
+\textbf{Aim}: This study aims to evaluate the impact of various preprocessing and data augmentation techniques on ML-based classification of schizophrenia from MRI data.
 
 \textbf{Methods}\\
-\lipsum[1]
+We utilized the COBRE dataset, which includes structural MRI data from 62 individuals, divided into 30 schizophrenia patients and 32 healthy controls. A support vector classifier (SVC) was employed to classify the data. Various preprocessing techniques—normalization, brain extraction, and cropping—and data augmentation methods—translation, rotation, and Gaussian noise addition—were applied to the MRI images. Model performance was assessed using accuracy, recall, precision, and F1-score.
 
 \textbf{Results}\\
-\lipsum[1]
+Normalization and brain extraction improved classification accuracy, with cropping achieving the highest accuracy (0.57) and F1-score (0.69) among the preprocessing techniques. Combining preprocessing methods did not always result in performance improvements and sometimes led to a decrease in accuracy. Data augmentation significantly enhanced model performance, with translation and rotation leading to the highest accuracy (0.79) and F1-score (0.80). However, Gaussian noise had a detrimental effect, reducing accuracy and F1-score.
 
 \textbf{Conclusion}\\
-\lipsum[1]
+Our findings indicate that careful selection of preprocessing and augmentation techniques is critical for optimizing model performance in schizophrenia detection. While certain preprocessing steps like normalization and cropping are beneficial, combining them may not always yield additive improvements. Augmentation techniques like translation and rotation proved effective in boosting model performance, while Gaussian noise should be avoided. These results contribute to the development of more standardized preprocessing pipelines for medical imaging, which could enhance the reliability and reproducibility of machine learning models in clinical applications.
 
-\textbf{Keywords: schizophrenia, sMRI, CNN}
+\textbf{Keywords: schizophrenia, sMRI, CNN, SVC}
 
 % Introduction
 \section{Introduction}
@@ -204,7 +204,7 @@ When combining preprocessing techniques, the pattern is less straightforward. Th
 			Brain extraction (3) & 0.54 & 0.78 & 0.60 & 0.68 \\
 			Cropping (4) & 0.57 & 0.76 & 0.63 & 0.69 \\
 			Smoothing (5) & 0.55 & 0.71 & 0.62 & 0.66 \\
-            1+2 & 0.56 & 0.76 & 0.57 & 0.65 \\
+            1+2 & 0.57 & 0.69 & 0.64 & 0.67 \\
             1+2+3 & 0.55 & 0.80 & 0.61 & 0.69 \\
             1+2+3+4 & 0.44 & 0.53 & 0.56 & 0.54 \\
             1+2+3+4+5 & 0.48 & 0.60 & 0.58 & 0.59 \\
@@ -215,7 +215,12 @@ When combining preprocessing techniques, the pattern is less straightforward. Th
 
 \subsection{Data Augmentation}
 
-According to the results, Table~\ref{tab:model_meetrics_augmentation}
+The results presented in Table~\ref{tab:model_meetrics_augmentation} highlight the impact of various data augmentation methods on model performance. The baseline model using raw data (0) achieved an accuracy of 0.51 and an F1-score of 0.63. In contrast, applying translation (1) significantly improved both accuracy (0.75) and F1-score (0.79), with a notable increase in recall (0.84), indicating that translation is effective at boosting model performance and sensitivity.
+
+Rotation (2) further improved results, with the highest accuracy (0.79) and F1-score (0.80), alongside strong recall (0.81) and precision (0.78), demonstrating its ability to enhance both model robustness and overall performance.
+
+Gaussian noise (3), however, led to a substantial decrease in performance, with an accuracy of only 0.33 and a low F1-score of 0.40. This suggests that adding noise may negatively affect the model, potentially obscuring relevant patterns in the data.
+
 \begin{center}
 	\begin{table}[t]
 		\centering
@@ -227,7 +232,7 @@ According to the results, Table~\ref{tab:model_meetrics_augmentation}
 			Raw (0) & 0.51 & 0.67 & 0.60 & 0.63 \\
 			Translation (1) & 0.75 & 0.84 & 0.74 & 0.79 \\
 			Rotation (2) & 0.79 & 0.81 & 0.78 & 0.80 \\
-			Gaussian Noise (3) & 0. & 0. & 0. & 0. \\
+			Gaussian Noise (3) & 0.33 & 0.32 & 0.53 & 0.40 \\
 			\bottomrule
 		\end{tabular*}
 	\end{table}
@@ -236,13 +241,23 @@ According to the results, Table~\ref{tab:model_meetrics_augmentation}
 % Discussion
 \section{Discussion}
 
-This study investigated...
+This study investigated the effects of various preprocessing and data augmentation techniques on the classification performance of schizophrenia from structural MRI data. The results demonstrate that certain preprocessing steps, such as normalization, brain extraction, and cropping, can improve model performance when applied individually. However, combining these steps did not yield consistent improvements, suggesting that over-processing may distort the data and hinder the model's ability to generalize effectively.
 
-These results suggest that while certain preprocessing steps (e.g., normalization, brain extraction, and cropping) contribute positively when applied individually, combining them does not necessarily yield additive benefits. Over-processing may introduce distortions that hinder model generalization.
+Among the individual preprocessing techniques, normalization resulted in the most substantial performance improvement, enhancing accuracy by 9.8\%. This can be attributed to the equalization of feature contributions, which allowed the model to make more accurate predictions. Interestingly, this outcome contradicts the conventional understanding that normalizing medical images may flatten clinically significant differences in intensity. The effectiveness of this technique in this study highlights the importance of context when applying preprocessing methods to medical imaging.
 
-The methods used for brain MR image augmentation have some limitations or drawbacks. For instance, in a study (Isensee et al. 2020), the augmentation approach uses elastic deformations, which add shape variations. However, the deformations can bring lots of damage and noise when the deformation field is varied seriously. Also, the generated images seem not to be realistic and natural. It has been shown in the literature that widely used elastic deformations produce unrealistic brain MR images (Mok and Chung 2018).
+Brain extraction, or skull stripping, while beneficial in other studies, had a moderate effect here, improving recall but slightly lowering accuracy. This suggests that removing non-brain tissues enhances the model's sensitivity to schizophrenia cases but may reduce precision, potentially due to the loss of relevant contextual information in the brain image. Cropping, on the other hand, demonstrated a clear advantage by improving accuracy and F1-score. By focusing on the brain region and reducing irrelevant background data, cropping effectively improved the signal-to-noise ratio, allowing the model to focus on clinically relevant features.
 
-augmentation with the combination of shearing and salt-and-pepper noise addition is the least efficient approach for augmentation in improving classification performance 
+However, combining preprocessing steps often led to diminished performance, especially when all techniques were applied together. The full preprocessing pipeline, including resampling, normalization, brain extraction, cropping, and smoothing, resulted in a performance drop, particularly in terms of accuracy and F1-score. This suggests that certain preprocessing steps, when combined, may interfere with each other, creating distortions that prevent the model from learning the most pertinent features of the data.
+
+Regarding data augmentation, both translation and rotation significantly enhanced model performance, with translation improving recall and rotation achieving the highest accuracy and F1-score. These results align with the literature, where such transformations are often used to increase the diversity of the training data, helping the model generalize better to unseen data. Gaussian noise, however, severely degraded performance, suggesting that it may obscure important features in the MRI images, leading to poorer model predictions.
+
+While preprocessing techniques like skull stripping, cropping, and smoothing have been shown to improve performance in various medical imaging tasks, the results in this study suggest that their effectiveness depends on the context and the combination of other preprocessing steps. Furthermore, the adverse effect of Gaussian noise indicates the need for careful consideration of the types of augmentation applied, as certain methods may introduce detrimental effects.
+
+In contrast to some previous studies that have used more complex augmentation techniques, such as elastic deformations, this study focused on simpler methods, which proved to be more effective. Elastic deformations can sometimes introduce unrealistic and unnatural variations, leading to damage and noise that harm model performance~\cite{Mok2018}. The methods investigated in this study, particularly translation and rotation, were found to be effective in maintaining the integrity of the original images while enhancing model robustness.
+
+Overall, this study highlights the importance of standardizing preprocessing and augmentation techniques in medical imaging, particularly for tasks like schizophrenia detection. While certain methods demonstrated clear benefits, the combination of multiple preprocessing steps should be approached with caution, as it may lead to diminishing returns or reduced model performance. Further research is needed to explore the optimal combination of preprocessing techniques and to investigate the impact of more advanced augmentation methods on model accuracy and generalizability.
+
+%augmentation with the combination of shearing and salt-and-pepper noise addition is the least efficient approach for augmentation in improving classification performance 
 
 % Discuss When Brain Extraction May Not Be Necessary
 
@@ -252,19 +267,22 @@ augmentation with the combination of shearing and salt-and-pepper noise addition
 % Conclusion
 \section{Conclusion}
 
-% Random text
-\lipsum[9-10]
+In this study, we investigated the impact of various preprocessing and data augmentation techniques on the classification performance of schizophrenia from structural MRI images. Our results demonstrate that individual preprocessing methods, particularly normalization, brain extraction, and cropping, can positively influence model performance, improving accuracy, recall, and F1-score. However, combining these techniques did not always lead to enhanced results, suggesting that over-processing may introduce distortions that hinder model generalization.
 
+Data augmentation proved to be a valuable tool, with translation and rotation significantly improving model robustness and performance, particularly in recall and accuracy. Conversely, adding Gaussian noise resulted in a substantial performance decrease, indicating that it may obscure critical features in the data.
 
+The findings emphasize the importance of careful selection and application of preprocessing and augmentation methods in medical imaging tasks. While some techniques show clear benefits, the combination of multiple preprocessing steps must be handled cautiously to avoid diminishing returns. These results underscore the need for a standardized preprocessing pipeline to enhance the reliability, reproducibility, and clinical applicability of machine learning models for schizophrenia detection.
+
+Further work is needed to refine preprocessing pipelines and explore more advanced data augmentation methods to improve the performance of ML-based schizophrenia diagnosis. Ultimately, this study contributes to the ongoing efforts to make ML-driven medical diagnostics more robust and applicable in real-world clinical settings.
 
 % Formalities
-\section*{Acknowledgements}
+%\section*{Acknowledgements}
 
-...
+%...
 
 \subsection*{Author contributions}
 
-\textbf{Conception}: Prosperity Oguama, Ilia Golub; \textbf{Data Acquisition}: Ilia Golub; \textbf{Preprocessing Pipeline Development}: ...; \textbf{Preprocessing Pipeline Testing}: ...; \textbf{Data Augmentation Pipeline Testing}: ...; \textbf{Neural Network Building}: ...; \textbf{Neural Network Testing}: ...; \textbf{Drafting \& Editing}: Ilia Golub, Prosperity Oguama. All authors contributed to the study, read, revised and approved the final manuscript.
+\textbf{Conception}: Prosperity Oguama, Ilia Golub; \textbf{Data Acquisition}: Ilia Golub; \textbf{Preprocessing \& Data Augmentation}: Ilia Golub; \textbf{Model Building \& Testing}: Prosperity Oguama; \textbf{Drafting \& Editing}: Ilia Golub, Prosperity Oguama. All authors contributed to the study, read, revised and approved the final manuscript.
 
 \subsection*{Data availability statement}
 The data underlying this article is publicly available and accessible through \hyperlink{Schizconnect}{http://schizconnect.org/}.
@@ -277,13 +295,12 @@ The authors report no financial disclosure.
 
 The authors declare no potential conflict of interests.
 
-\renewcommand{\baselinestretch}{1.5} % Полуторный межстрочный интервал
+\renewcommand{\baselinestretch}{1.5}
 %\singlespacing
 %\renewcommand\bibname{Bibliography}
 \bibliographystyle{abbrv} %abbrv
-\phantomsection     % для корректных ссылок на
-\cleardoublepage    % библиографию
+\phantomsection     % 
+\cleardoublepage    % 
 \bibliography{paper}
-
 
 \end{document}

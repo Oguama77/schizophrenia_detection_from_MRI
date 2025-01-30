@@ -6,6 +6,12 @@ S.~Gengec~Benli and M.~Andac.
   features from multiple brain regions and machine learning techniques.
 \newblock {\em Diagnostics}, 13(13), 2023.
 
+\bibitem{Mok2018}
+T.~C.~W. Mok and A.~C.~S. Chung.
+\newblock Learning data augmentation for brain tumor segmentation with
+  coarse-to-fine generative adversarial networks.
+\newblock page 70–80, 2019.
+
 \bibitem{Oh2020}
 J.~Oh, B.-L. Oh, K.-U. Lee, J.-H. Chae, and K.~Yun.
 \newblock Identifying schizophrenia using structural mri with a deep learning
