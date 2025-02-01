@@ -3,7 +3,6 @@ import torch.nn as nn
 from torchvision import models
 from sklearn.svm import SVC
 from sklearn.pipeline import make_pipeline
-from sklearn.model_selection import GridSearchCV
 from sklearn.preprocessing import StandardScaler
 
 # ResNet-18 for Feature Extraction
@@ -32,8 +31,22 @@ class FeatureExtractor(nn.Module):
         return x.view(x.size(0), -1)  # Flatten to (batch_size, feature_dim)
     
 # Support Vector Classifier for image classification
-def vector_classifier():
-    # Values are hardcoded after a grid search
-    svm_classifier = make_pipeline(StandardScaler(), 
-                               SVC(kernel='rbf', probability=True, C= 100, gamma= 0.0001, random_state=42))
-    return svm_classifier
+class SVMClassifier:
+    def __init__(self, kernel='rbf', C=100, gamma=0.0001, random_state=42):
+        """Initializes the SVM classifier with specified parameters."""
+        self.pipeline = make_pipeline(
+            StandardScaler(),
+            SVC(kernel=kernel, probability=True, C=C, gamma=gamma, random_state=random_state)
+        )
+    
+    def train(self, train_features, train_labels):
+        """Trains the SVM classifier on the given data."""
+        self.pipeline.fit(train_features, train_labels)
+    
+    def predict(self, test_features):
+        """Predicts labels for the given test features."""
+        return self.pipeline.predict(test_features)
+    
+    def predict_proba(self, test_features):
+        """Returns probability estimates for the given test features."""
+        return self.pipeline.predict_proba(test_features)
