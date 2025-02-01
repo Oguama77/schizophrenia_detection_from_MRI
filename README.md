@@ -3,28 +3,38 @@
 This project focuses on exploring the effect of various preprocessing and data augmentation methods on thre results of detecting schizophrenia from Magnetic Resonance (MR) images. The aim of this exploration is to address the existing ambiguity in how MR images are preprocessed before training, as most authors in literature perform preprocessing in MATLAB without clear instructions for reproducibility.
 
 ## Project Data:
-Find the raw data at [SchizConnect] {http://schizconnect.org/}
+Find the raw data at [SchizConnect](http://schizconnect.org/)
 The data comes as 3-dimensional MRI volumes in NifTI format
 
 
-![Sample volume](tools/sample_volume.png)
+                            ![Sample volume](tools/sample_volume.png)
 
 
 
 
 ## Project Workflow:
-Data Exploration >> [Preprocessing] (src/utils/preprocess.py) & [Augmentation] (src/augmentation.py) >> [Feature Extraction & Training] (src/models/models.py) >> Visualizing training results
+Data Exploration >> [Preprocessing](src/utils/preprocess.py) & [Augmentation](src/augmentation.py) >> [Feature Extraction & Training](src/models/models.py) >> Visualizing training results
 
 ## Repository Structure
 C:.
 +---src
    +---models
    +---paper
-   ª   +---figs
+      +---figs
    +---utils
        +---__pycache__
 +---tests
 +---tools
+
+C:.
+├───src
+│   ├───models
+│   ├───paper
+│   │   └───figs
+│   └───utils
+│       └───__pycache__
+├───tests
+└───tools
 
 ## To run the project follow this commands:
 All command should run under project root/working-directory
