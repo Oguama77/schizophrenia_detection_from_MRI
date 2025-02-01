@@ -67,8 +67,8 @@ Data Exploration >> [Preprocessing](src/utils/preprocess.py) & [Augmentation](sr
 |
 \---tools
         convert_nii_pt.py
-        sample_volume.png```
-
+        sample_volume.png
+```
 
 ## To run the project follow this commands:
 All command should run under project root/working-directory
