@@ -1,12 +1,11 @@
-import os
 import argparse
-import numpy as np
 import matplotlib.pyplot as plt
-from image_preprocessor import ImagePreprocessor
-from image_augmentor import ImageAugmentor
-from schizophrenia_eda import SchizophreniaEDA
-from svm_classifier import SVMClassifier
-from svm_visualizer import SVMVisualizer
+from utils.preprocess import ImagePreprocessor
+from utils.augmentation import ImageAugmentor
+from utils.data_visualization import SchizophreniaEDA
+from models.models import SVMClassifier
+from models.models import FeatureExtractor
+from utils.model_plotter import SVMVisualizer
 
 
 def main(args):
@@ -14,7 +13,8 @@ def main(args):
     preprocessor = ImagePreprocessor()
     augmentor = ImageAugmentor()
     eda = SchizophreniaEDA()
-    classifier = SVMClassifier()
+    feature_extractor= FeatureExtractor()
+    svm_classifier = SVMClassifier()
     visualizer = SVMVisualizer()
 
     # Step 1: Load and preprocess images
@@ -32,22 +32,28 @@ def main(args):
     # Step 3: Exploratory Data Analysis (EDA)
     print("Performing exploratory data analysis...")
     eda.perform_analysis(processed_images, labels)
-
-    # Step 4: Train the SVM Classifier
+    
+    # Step 4: Extract features with ResNet-18
+    print("Extracting features...")
+    train_features, train_labels = extract_features(train_loader, feature_extractor, device)
+    
+    # Step 5: Train the SVM Classifier
     print("Training SVM classifier...")
-    X_train, X_test, y_train, y_test = classifier.split_data(processed_images, labels)
-    classifier.train(X_train, y_train)
-    accuracy, report = classifier.evaluate(X_test, y_test)
+    svm_classifier.pipeline()
+    svm_classifier.train(train_features, train_labels)
+    predicted_labels = svm_classifier.predict(test_features)
+    test_scores = svm_classifier.predict_proba(test_features)
+    
     print(f"Model Accuracy: {accuracy:.2f}")
     print("Classification Report:\n", report)
 
-    # Step 5: Visualize SVM results
+    # Step 6: Visualize SVM results
     print("Visualizing classifier results...")
-    visualizer.plot_decision_boundary(X_train, y_train, classifier.model)
-    visualizer.plot_confusion_matrix(y_test, classifier.predict(X_test))
+    visualizer.plot_confusion_matrix(test_labels, predicted_labels)
+    visualizer.plot_roc_curve(test_labels, test_scores)
     plt.show()
 
-    # Step 6: Save trained model
+    # Step 7: Save trained model
     if args.save_model:
         classifier.save_model(args.model_path)
         print(f"Model saved to {args.model_path}")

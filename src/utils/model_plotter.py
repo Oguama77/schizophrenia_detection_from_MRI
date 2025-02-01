@@ -17,9 +17,9 @@ class SVMVisualizer:
         plt.title('Confusion Matrix')
         plt.show()
     
-    def plot_roc_curve(self, true_labels, predicted_probabilities):
+    def plot_roc_curve(self, true_labels, test_scores):
         """Plots the ROC curve."""
-        fpr, tpr, _ = roc_curve(true_labels, predicted_probabilities[:, 1])
+        fpr, tpr, _ = roc_curve(true_labels, test_scores[:, 1])
         roc_auc = auc(fpr, tpr)
         
         plt.figure(figsize=(6, 5))
