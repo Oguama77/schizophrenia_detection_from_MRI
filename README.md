@@ -1,9 +1,9 @@
-# Schizo
+# Schizophrenia Detection from Magnetic Resonance Images
 ### Overiew
-This project focuses on exploring the effect of various preprocessing and data augmentation methods on thre results of detecting schizophrenia from Magnetic Resonance (MR) images. The aim of this exploration is to address the existing ambiguity in how MR images are preprocessed before training, as most authors in literature perform preprocessing in MATLAB without clear instructions for reproducibility.
+This project focuses on exploring the effect of various preprocessing and data augmentation methods on the accuracy of schizophrenia detection from Magnetic Resonance (MR) images. The aim of this exploration is to address the existing ambiguity in how MR images are preprocessed before training, as most authors in literature perform preprocessing in MATLAB without clear instructions for reproducibility.
 
 ## Project Data:
-Find the raw data at [SchizConnect](http://schizconnect.org/)
+Find the raw data at [SchizConnect](http://schizconnect.org/).  
 The data comes as 3-dimensional MRI volumes in NifTI format
 
 
