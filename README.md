@@ -17,7 +17,7 @@ The data comes as 3-dimensional MRI volumes in NifTI format
 Data Exploration >> [Preprocessing](src/utils/preprocess.py) & [Augmentation](src/augmentation.py) >> [Feature Extraction & Training](src/models/models.py) >> Visualizing training results
 
 ## Repository Structure
-C:.
+```.
 |   .gitignore
 |   pyproject.toml
 |   README.md
@@ -67,7 +67,7 @@ C:.
 |
 \---tools
         convert_nii_pt.py
-        sample_volume.png
+        sample_volume.png```
 
 
 ## To run the project follow this commands:
