@@ -70,7 +70,6 @@ C:.
         sample_volume.png
 
 
-
 ## To run the project follow this commands:
 All command should run under project root/working-directory
 ```bash 
