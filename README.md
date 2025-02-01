@@ -7,9 +7,10 @@ Find the raw data at [SchizConnect](http://schizconnect.org/)
 The data comes as 3-dimensional MRI volumes in NifTI format
 
 
-                            ![Sample volume](tools/sample_volume.png)
 
-
+<p align="center">
+  <img src="tools/sample_volume.png" alt="Sample volume">
+</p>
 
 
 ## Project Workflow:
@@ -17,24 +18,58 @@ Data Exploration >> [Preprocessing](src/utils/preprocess.py) & [Augmentation](sr
 
 ## Repository Structure
 C:.
+|   .gitignore
+|   pyproject.toml
+|   README.md
+|   schizo.code-workspace
+|   selected_files.csv
+|   tox.ini
+|
 +---src
-   +---models
-   +---paper
-      +---figs
-   +---utils
-       +---__pycache__
+|   |   augmentation_pipeline.py
+|   |   best_pipeline.py
+|   |   create_raw_train_set.py
+|   |   create_train_set.py
+|   |   logger.py
+|   |   main.py
+|   |   preprocessing_pipeline.py
+|   |   __init__.py
+|   |
+|   +---models
+|   |       models.py
+|   |       __init__.py
+|   |
+|   +---paper
+|   |   |   paper.bbl
+|   |   |   paper.bib
+|   |   |   paper.pdf
+|   |   |   paper.tex
+|   |   |   preamble.tex
+|   |   |
+|   |   \---figs
+|   |           empty.pdf
+|   |           model_architecture.png
+|   |
+|   \---utils
+|       |   augmentation.py
+|       |   data_loader.py
+|       |   preprocess.py
+|       |   preprocess_validation.py
+|       |   __init__.py
+|       |
+|       \---__pycache__
+|               __init__.cpython-312.pyc
+|
 +---tests
-+---tools
+|       test_data_loader.py
+|       test_preprocess.py
+|       __init__.py
+|
+\---tools
+        convert_nii_pt.py
+        sample_volume.png
 
-C:.
-├───src
-│   ├───models
-│   ├───paper
-│   │   └───figs
-│   └───utils
-│       └───__pycache__
-├───tests
-└───tools
+
 
 ## To run the project follow this commands:
 All command should run under project root/working-directory
