@@ -1,4 +1,4 @@
-<h1 align="center">Schizophrenia Classification from Magnetic Resonance Images</h1>
+## Schizophrenia Classification from Magnetic Resonance Images
 ### Overview
 This project focuses on exploring the effect of various preprocessing and data augmentation methods on the accuracy of schizophrenia detection from Magnetic Resonance (MR) images. The aim of this exploration is to address the existing ambiguity in how MR images are preprocessed before training, as most authors in literature perform preprocessing in MATLAB without clear instructions for reproducibility.
 
@@ -9,7 +9,7 @@ The data comes as 3-dimensional MRI volumes in NifTI format
 
 
 <p align="center">
-  <img src="paper/figs/sample_volume.png" alt="Sample volume">
+  <img src="src/paper/figs/sample_volume.png" alt="Sample volume">
 </p>
 
 
