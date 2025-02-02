@@ -1,36 +1,25 @@
-import numpy as np
-from scipy.ndimage import rotate, shift
+import os
+import torch
+import random
+from utils.augmentations import apply_translation, apply_rotation, apply_gaussian_noise
 
+def augment_images(input_dir, output_dir, augmentation_type, num_augmentations):
+    os.makedirs(output_dir, exist_ok=True)
 
-class ImageAugmentor:
+    for file in os.listdir(input_dir):
+        if file.endswith(".pt"):
+            file_path = os.path.join(input_dir, file)
+            image_data = torch.load(file_path).numpy()
 
-    def __init__(self,
-                 apply_translation=True,
-                 apply_rotation=True,
-                 apply_gaussian_noise=True):
-        self.apply_translation = apply_translation
-        self.apply_rotation = apply_rotation
-        self.apply_gaussian_noise = apply_gaussian_noise
+            for i in range(num_augmentations):
+                if augmentation_type == "translation":
+                    augmented = apply_translation(image_data, (random.randint(-10, 10), random.randint(-10, 10)))
+                elif augmentation_type == "rotation":
+                    augmented = apply_rotation(image_data, random.uniform(-10, 10))
+                elif augmentation_type == "gaussian_noise":
+                    augmented = apply_gaussian_noise(image_data, mean=0, std=0.1)
 
-    def augment(self, image, translation=(0, 0), angle=0, mean=0, std=0.1):
-        """Applies selected augmentations to the image."""
-        if self.apply_translation:
-            image = self._apply_translation(image, translation)
-        if self.apply_rotation:
-            image = self._apply_rotation(image, angle)
-        if self.apply_gaussian_noise:
-            image = self._apply_gaussian_noise(image, mean, std)
-        return image
+                save_path = os.path.join(output_dir, f"{os.path.splitext(file)[0]}_{augmentation_type}_{i}.pt")
+                torch.save(torch.tensor(augmented, dtype=torch.float32), save_path)
+                print(f"Saved: {save_path}")
 
-    def _apply_translation(self, image, translation):
-        return shift(image,
-                     shift=(translation[0], translation[1], 0),
-                     mode='nearest')
-
-    def _apply_rotation(self, image, angle):
-        return rotate(image, angle, axes=(0, 1), reshape=False, mode='nearest')
-
-    def _apply_gaussian_noise(self, image, mean, std):
-        std = image.std() * std
-        noise = np.random.normal(mean, std, image.shape).astype(image.dtype)
-        return image + noise
