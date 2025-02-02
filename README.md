@@ -1,20 +1,20 @@
-## Schizophrenia Detection from Magnetic Resonance Images
+## Schizophrenia Classification from Magnetic Resonance Images
 ### Overview
 This project focuses on exploring the effect of various preprocessing and data augmentation methods on the accuracy of schizophrenia detection from Magnetic Resonance (MR) images. The aim of this exploration is to address the existing ambiguity in how MR images are preprocessed before training, as most authors in literature perform preprocessing in MATLAB without clear instructions for reproducibility.
 
 ### Project Data:
 Find the raw data at [SchizConnect](http://schizconnect.org/).  
-The data comes as 3-dimensional MRI volumes in NifTI format
+The data comes as 3-dimensional MRI volumes in NifTI format:
 
 
 
 <p align="center">
-  <img src="tools/sample_volume.png" alt="Sample volume">
+  <img src="src/paper/figs/sample_volume.png" alt="Sample volume">
 </p>
 
 
 ### Project Workflow:
-Data Exploration >> [Preprocessing](src/utils/preprocess.py) & [Augmentation](src/augmentation.py) >> [Feature Extraction & Training](src/models/models.py) >> Visualizing training results
+[Data Exploration](src/utils/data_visualization.py) >> [Preprocessing](src/utils/preprocess.py) & [Augmentation](src/utils/augmentation.py) >> [Feature Extraction & Training](src/models/models.py) >> [Visualizing training results](src/utils/model_plotter.py)
 
 ### Repository Structure
 ```.
@@ -26,13 +26,8 @@ Data Exploration >> [Preprocessing](src/utils/preprocess.py) & [Augmentation](sr
 |   tox.ini
 |
 +---src
-|   |   augmentation_pipeline.py
-|   |   best_pipeline.py
-|   |   create_raw_train_set.py
-|   |   create_train_set.py
 |   |   logger.py
 |   |   main.py
-|   |   preprocessing_pipeline.py
 |   |   __init__.py
 |   |
 |   +---models
@@ -53,6 +48,8 @@ Data Exploration >> [Preprocessing](src/utils/preprocess.py) & [Augmentation](sr
 |   \---utils
 |       |   augmentation.py
 |       |   data_loader.py
+|       |   data_visualization.py
+|       |   model_plotter.py
 |       |   preprocess.py
 |       |   preprocess_validation.py
 |       |   __init__.py
@@ -67,7 +64,6 @@ Data Exploration >> [Preprocessing](src/utils/preprocess.py) & [Augmentation](sr
 |
 \---tools
         convert_nii_pt.py
-        sample_volume.png
 ```
 
 ## To run the project follow this commands:
