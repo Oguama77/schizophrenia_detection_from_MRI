@@ -1,7 +1,6 @@
-import os
-from preprocessing import preprocess_images
-from augmentation import augment_images
-from dataset_preparation import prepare_dataset
+from utils.preprocessing import preprocess_images
+from utils.augmentation import augment_images
+from utils.dataset_preparation import prepare_dataset
 
 def main():
     # Define paths
