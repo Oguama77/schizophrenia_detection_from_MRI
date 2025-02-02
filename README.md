@@ -4,7 +4,7 @@ This project focuses on exploring the effect of various preprocessing and data a
 
 ### Project Data:
 Find the raw data at [SchizConnect](http://schizconnect.org/).  
-The data comes as 3-dimensional MRI volumes in NifTI format
+The data comes as 3-dimensional MRI volumes in NifTI format:
 
 
 
@@ -14,7 +14,7 @@ The data comes as 3-dimensional MRI volumes in NifTI format
 
 
 ### Project Workflow:
-Data Exploration >> [Preprocessing](src/utils/preprocess.py) & [Augmentation](src/augmentation.py) >> [Feature Extraction & Training](src/models/models.py) >> Visualizing training results
+[Data Exploration](src/utils/data_visualization.py) >> [Preprocessing](src/utils/preprocess.py) & [Augmentation](src/augmentation.py) >> [Feature Extraction & Training](src/models/models.py) >> [Visualizing training results](src/utils/model_plotter.py)
 
 ### Repository Structure
 ```.
