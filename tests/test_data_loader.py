@@ -5,11 +5,11 @@ import pandas as pd
 import glob
 from unittest.mock import patch, MagicMock
 from utils.preprocess import load_nii
-from utils import data_loader 
+from utils.data_loader import MRIDataset 
 
 def mock_load_nii(file_path):
     """Mock function to simulate loading a NIfTI image."""
-    return torch.rand((1, 128, 128, 128))  # Simulating a 3D tensor
+    return load_nii(torch.rand((1, 128, 128, 128)))  # Simulating a 3D tensor
 
 def mock_preprocess_image(image):
     """Mock function to simulate preprocessing an image."""

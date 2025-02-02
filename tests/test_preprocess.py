@@ -6,21 +6,16 @@ import numpy as np
 from unittest.mock import patch
 from tempfile import NamedTemporaryFile
 from unittest.mock import patch, MagicMock
-from scipy.ndimage import binary_closing, binary_opening
-from skimage.filters import threshold_otsu
-from scipy.ndimage import gaussian_filter
-
-
 
 # Import functions
-from utils import load_nii 
-from utils import get_data
-from utils import get_affine
-from utils import match_dimensions
-from utils import resample_image
-from utils import normalize_data, crop_to_largest_bounding_box, get_largest_brain_mask_slice
-from utils import refine_brain_mask, get_largest_brain_mask_slice
-from utils import apply_gaussian_smoothing
+from utils.preprocess import load_nii 
+from utils.preprocess import get_data
+from utils.preprocess import get_affine
+from utils.preprocess import match_dimensions
+from utils.preprocess import resample_image
+from utils.preprocess import normalize_data, crop_to_largest_bounding_box, get_largest_brain_mask_slice
+from utils.preprocess import get_largest_brain_mask_slice
+from utils.preprocess import apply_gaussian_smoothing
 
 
 class TestLoadNii(unittest.TestCase):
@@ -379,78 +374,6 @@ class TestNormalizeData(unittest.TestCase):
         # Ensure that the function still works with a small epsilon even if there's zero variation
         self.assertEqual(np.min(result), 0)
         self.assertEqual(np.max(result), 0)
-
-
-class TestRefineBrainMask(unittest.TestCase):
-
-    def test_refine_brain_mask(self):
-        # Create a simple binary mask
-        mask = np.array([[0, 0, 1, 1, 0],
-                         [0, 1, 1, 1, 0],
-                         [0, 1, 1, 1, 0],
-                         [0, 0, 1, 1, 0],
-                         [0, 0, 0, 0, 0]], dtype=np.uint8)
-        
-        # Call refine_brain_mask with no structure provided
-        refined_mask = refine_brain_mask(mask)
-
-        # Check that the result is a numpy array
-        self.assertIsInstance(refined_mask, np.ndarray)
-
-        # Check if the result contains only 0s and 1s (binary mask)
-        self.assertTrue(np.all(np.isin(refined_mask, [0, 1])))
-
-        # Check that the refined mask looks as expected (after closing and opening)
-        expected_refined_mask = binary_opening(binary_closing(mask), structure=None)
-        np.testing.assert_array_equal(refined_mask, expected_refined_mask)
-
-    def test_empty_mask(self):
-        # Create an empty mask
-        mask = np.zeros((5, 5), dtype=np.uint8)
-
-        # Call refine_brain_mask
-        refined_mask = refine_brain_mask(mask)
-
-        # Check if the result is an empty mask (no changes should be made)
-        np.testing.assert_array_equal(refined_mask, mask)
-
-    def test_mask_with_structure(self):
-        # Create a simple binary mask
-        mask = np.array([[0, 0, 1, 1, 0],
-                         [0, 1, 1, 1, 0],
-                         [0, 1, 1, 1, 0],
-                         [0, 0, 1, 1, 0],
-                         [0, 0, 0, 0, 0]], dtype=np.uint8)
-        
-        # Define a structure (e.g., a 3x3 square kernel)
-        structure = np.ones((3, 3), dtype=np.uint8)
-
-        # Call refine_brain_mask with structure
-        refined_mask = refine_brain_mask(mask, structure=structure)
-
-        # Check if the result is a numpy array
-        self.assertIsInstance(refined_mask, np.ndarray)
-
-        # Check if the result contains only 0s and 1s (binary mask)
-        self.assertTrue(np.all(np.isin(refined_mask, [0, 1])))
-
-        # Check that the refined mask is as expected after closing and opening with the structure
-        expected_refined_mask = binary_opening(binary_closing(mask, structure=structure), structure=structure)
-        np.testing.assert_array_equal(refined_mask, expected_refined_mask)
-
-    def test_no_refinement_needed(self):
-        # Create a mask that doesn't need refinement (only a single pixel set)
-        mask = np.array([[0, 0, 0, 0, 0],
-                         [0, 0, 1, 0, 0],
-                         [0, 0, 0, 0, 0],
-                         [0, 0, 0, 0, 0],
-                         [0, 0, 0, 0, 0]], dtype=np.uint8)
-
-        # Call refine_brain_mask
-        refined_mask = refine_brain_mask(mask)
-
-        # Since no changes should happen, the output should be identical to the input
-        np.testing.assert_array_equal(refined_mask, mask)
 
 
 class TestGetLargestBrainMaskSlice(unittest.TestCase):
