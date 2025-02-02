@@ -14,7 +14,7 @@ The data comes as 3-dimensional MRI volumes in NifTI format:
 
 
 ### Project Workflow:
-[Data Exploration](src/utils/data_visualization.py) >> [Preprocessing](src/utils/preprocess.py) & [Augmentation](src/augmentation.py) >> [Feature Extraction & Training](src/models/models.py) >> [Visualizing training results](src/utils/model_plotter.py)
+[Data Exploration](src/utils/data_visualization.py) >> [Preprocessing](src/utils/preprocess.py) & [Augmentation](src/utils/augmentation.py) >> [Feature Extraction & Training](src/models/models.py) >> [Visualizing training results](src/utils/model_plotter.py)
 
 ### Repository Structure
 ```.
@@ -26,13 +26,8 @@ The data comes as 3-dimensional MRI volumes in NifTI format:
 |   tox.ini
 |
 +---src
-|   |   augmentation_pipeline.py
-|   |   best_pipeline.py
-|   |   create_raw_train_set.py
-|   |   create_train_set.py
 |   |   logger.py
 |   |   main.py
-|   |   preprocessing_pipeline.py
 |   |   __init__.py
 |   |
 |   +---models
@@ -53,6 +48,8 @@ The data comes as 3-dimensional MRI volumes in NifTI format:
 |   \---utils
 |       |   augmentation.py
 |       |   data_loader.py
+|       |   data_visualization.py
+|       |   model_plotter.py
 |       |   preprocess.py
 |       |   preprocess_validation.py
 |       |   __init__.py
@@ -67,7 +64,6 @@ The data comes as 3-dimensional MRI volumes in NifTI format:
 |
 \---tools
         convert_nii_pt.py
-        sample_volume.png
 ```
 
 ## To run the project follow this commands:
