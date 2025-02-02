@@ -41,7 +41,13 @@ The raw data were obtained from the \href{http://schizconnect.org}{SchizConnect}
 
 The data obtained originates from the Center of Biomedical Research Excellence (COBRE) dataset in NifTI format. It includes data from 62 individuals, 30 with schizophrenia and 32 healthy controls.
 
-The data from SchizConnect was filtered based on MRI field strength and clinical diagnosis. We retrieved only images captured with 3T MRI scans. This was done to ensure uniformity of the data obtained.
+The data from SchizConnect was filtered based on MRI field strength and clinical diagnosis. We retrieved only images captured with 3T MRI scans. This was done to ensure uniformity of the data obtained. Figure~\ref{fig:raw_mri_volume_slices} presents the example of raw data.
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.8\textwidth]{./figs/sample_volume.png} % test_pipeline.png
+    \caption{Three image slices representing the average of a 3D column in three views: dorsal, lateral, and superior respectively}\label{fig:raw_mri_volume_slices}
+\end{figure}
+
 
 Clinical data was made available in form of CSV files. The demographic features of the dataset used in this project are presented in Table~\ref{tab:cobre_clinical_demographic}.
 \begin{center}
