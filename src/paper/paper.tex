@@ -79,12 +79,13 @@ We experimented with different combinations of preprocessing and data augmentati
 
 In order to find the best combination of hyperparameters for each preprocessing method, we performed a grid search and measured the quality metrics of the processed image using a custom test function.
 
-Table~\ref{tab:preprocessing_pipeline} presents the preprocessing techniques used and their respective hyperparameters and tools used. Figure~\ref{fig:test_pipeline} gives a visual representation of the conducted tests.
+Table~\ref{tab:preprocessing_pipeline} presents the preprocessing techniques used and their respective hyperparameters and tools used. Figure~\ref{fig:test_pipeline} gives a comparison of a raw image and a preprocessed image, also indicating the image metrics.
+%Figure~\ref{fig:test_pipeline} gives a visual representation of the conducted tests.
 %
 \begin{figure}[h]
     \centering
-    \includegraphics[width=0.4\textwidth]{./figs/empty.pdf} % test_pipeline.png
-    \caption{Tests pipeline for MRI data.}\label{fig:test_pipeline}
+    \includegraphics[width=0.4\textwidth]{./figs/slice_comparison.png} % test_pipeline.png
+    \caption{Panel (A) shows a slice of a raw scan. Panel (B) shows a slice of a preprocessed scan. For preprocessed scans, the standard deviation of SNR values is relatively low (\mbox{$SNR= 25 \pm 1$}), which ensures consistency in the image quality and prevents the model from making predictions based on possible artifacts.}\label{fig:test_pipeline}
 \end{figure}
 
 \subsubsection{Resampling}
@@ -169,7 +170,7 @@ The augmented samples were plotted to ensure the transformations don't distort a
 %
 \subsection{Model architectures}
 
-Convolutional Neural Networks (CNNs) are commonly used in the literature for this task. However, a few papers explored the use of support vector machines for image classification. To gain a full understanding of both approaches, we decided on the combination of a pretrained deep neural network for feature extraction and a support vector classifier for binary classification. The ReNet-18 architecture was selected for its balance between computational load and accuracy. Cross validation was performed with the support vector classifier (SVC) to choose the best hyperparameters, and the hyperparameters that yielded the best results were the radial basis function (RBF) kernel, a gamma value of 0.0001 and a C parameter value of 100. Each 2D slice of the images were fed into the ResNet-18 model as NumPy arrays of dimension $224x224$. This input size corresponds to the size of the images in the ImageNet dataset that was used to train ResNet-18 and was selected for compatibility with the pretrained weights of the ResNet-18 model. Figure~\ref{fig:training_architecture} gives a representation of the training architecture and flow.
+Convolutional Neural Networks (CNNs) are commonly used in the literature for this task. However, a few papers explored the use of support vector machines for image classification. To gain a full understanding of both approaches, we decided on the combination of a pretrained deep neural network for feature extraction and a support vector classifier for binary classification. The ReNet-18 architecture was selected for its balance between computational load and accuracy. Cross validation was performed with the support vector classifier (SVC) to choose the best hyperparameters, and the hyperparameters that yielded the best results were the radial basis function (RBF) kernel, a gamma value of 0.0001 and a C parameter value of 100. Each 2D slice of the images were fed into the ResNet-18 model as NumPy arrays of dimension \texttt{224x224}. This input size corresponds to the size of the images in the ImageNet dataset that was used to train ResNet-18 and was selected for compatibility with the pretrained weights of the ResNet-18 model. Figure~\ref{fig:training_architecture} gives a representation of the training architecture and flow.
 %
 \begin{figure}
     \centering
