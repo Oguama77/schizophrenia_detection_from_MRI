@@ -2,8 +2,8 @@
 ### Overview
 This project focuses on exploring the effect of various preprocessing and data augmentation methods on the accuracy of schizophrenia detection from Magnetic Resonance (MR) images. The aim of this exploration is to address the existing ambiguity in how MR images are preprocessed before training, as most authors in literature perform preprocessing in MATLAB without clear instructions for reproducibility.
 
-### Project Data:
-Find the raw data at [SchizConnect](http://schizconnect.org/).  
+### Project Data
+Find the raw data at [SchizConnect](http://schizconnect.org/) 
 The data comes as 3-dimensional MRI volumes in NifTI format:
 
 
@@ -13,7 +13,7 @@ The data comes as 3-dimensional MRI volumes in NifTI format:
 </p>
 
 
-### Project Workflow:
+### Project Workflow
 [Data Exploration](src/utils/data_visualization.py) >> [Preprocessing](src/utils/preprocess.py) & [Augmentation](src/utils/augmentation.py) >> [Feature Extraction & Training](src/models/models.py) >> [Visualizing training results](src/utils/model_plotter.py)
 
 ### Repository Structure
