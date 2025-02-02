@@ -15,8 +15,8 @@ def mock_preprocess_image(image):
     """Mock function to simulate preprocessing an image."""
     return image  # Assume it returns the same tensor
 
-@patch("utils.preprocess.load_nii", side_effect=mock_load_nii)
-@patch("dataset.preprocess_image", side_effect=mock_preprocess_image)
+@patch("src.utils.data_loader", side_effect=mock_load_nii)
+@patch("src.utils.preprocess", side_effect=mock_preprocess_image)
 @patch("pandas.read_csv")
 @patch("glob.glob")
 def test_mri_dataset(mock_glob, mock_read_csv, mock_preprocess, mock_load_nii):
