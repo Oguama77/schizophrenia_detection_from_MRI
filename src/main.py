@@ -1,6 +1,7 @@
 from logger import logger
 import yaml
 
+from utils.eda import SchizophreniaEDA
 from utils.preprocessing import preprocess_images
 from utils.augmentation import augment_images
 from utils.dataset_preparation import prepare_dataset
@@ -27,6 +28,15 @@ def main():
     preprocessing_steps = ["resample", "normalize", "extract_brain"]
     augmentation_type = "translation"  # Options: 'translation', 'rotation', 'gaussian_noise'
     num_augmentations = 5
+
+    # Step 0: Explanatory data analysis
+    """
+    Performs an explanatory data analysis on the raw images and corresponding clinical data.
+    This step is optional and can be skipped if not necessary.
+    """
+    eda = SchizophreniaEDA(PATH_TO_CLINICAL_DATA, PATH_TO_RAW_IMAGES)
+    eda.perform_eda()
+    logger.info("EDA completed.")
 
     # Step 1: Select the data (train, test)
     """
