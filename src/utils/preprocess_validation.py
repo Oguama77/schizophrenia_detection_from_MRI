@@ -495,8 +495,8 @@ def calculate_ssim(data1: np.ndarray, data2: np.ndarray) -> float:
     return ssim(data1, data2, data_range=data1.max() - data1.min())
 
 
-def calculate_metrics(reference_data: np.ndarray, 
-                      modified_data: np.ndarray, 
+def calculate_metrics(reference_data: np.ndarray = None, 
+                      modified_data: np.ndarray = None, 
                       preprocessing_step: str = None
                       ) -> dict:
     """
@@ -516,14 +516,19 @@ def calculate_metrics(reference_data: np.ndarray,
     # Dictionary to store the metrics values
     results_metrics = []
     # Compute metrics
-    modified_data_matched = match_dimensions(reference_data, modified_data)
+    if reference_data is not None:
+        modified_data_matched = match_dimensions(reference_data, modified_data)
 
+        mse_value = calculate_mse(reference_data, modified_data_matched)
+        psnr_value = calculate_psnr(reference_data, modified_data_matched, mse=mse_value)
+        ssim_value = calculate_ssim(reference_data, modified_data_matched)
+    else:
+        mse_value = -1
+        psnr_value = -1
+        ssim_value = -1
+        
     snr_value = calculate_snr_with_mask(modified_data)
     cnr_value = calculate_cnr(modified_data)
-
-    mse_value = calculate_mse(reference_data, modified_data_matched)
-    psnr_value = calculate_psnr(reference_data, modified_data_matched, mse=mse_value)
-    ssim_value = calculate_ssim(reference_data, modified_data_matched)
 
     relative_psnr_value = calculate_relative_psnr(modified_data)
     relative_rmse_value = calculate_relative_rmse(modified_data)

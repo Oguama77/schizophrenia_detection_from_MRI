@@ -2,13 +2,18 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
+import torch
+
+from utils.preprocess_validation import calculate_metrics
 
 class SchizophreniaEDA:
-    def __init__(self, file_path):
+    def __init__(self, path_to_clinical_data = None, path_to_raw_images = None):
         """Initializes the EDA class with the dataset."""
-        self.df = pd.read_csv(file_path)
+        self.df = pd.read_csv(path_to_clinical_data)
         self.schiz_df = self._add_schiz_column()
         self._create_age_groups()
+
+        self.path_to_raw_images = path_to_raw_images
     
     def _add_schiz_column(self):
         """Adds a binary schizophrenia column."""
@@ -54,3 +59,21 @@ class SchizophreniaEDA:
             "Schizophrenia": df_schiz["age"].describe(),
             "No Schizophrenia": df_ns["age"].describe()
         }
+    
+    def assess_raw_images(self):
+        """Assesses the quality of raw images."""
+        raw_metrics_all_images = {} # TODO: should contain paths to images
+
+        # iterate over all .pt files in path_to_raw_images
+        for path in self.path_to_raw_images:
+            loaded_tensor = torch.load(path)
+            tensor_to_numpy = loaded_tensor.numpy()
+            raw_metrics_per_image = calculate_metrics(None, tensor_to_numpy)
+            raw_metrics_all_images.append(raw_metrics_per_image)
+        return raw_metrics_all_images
+    
+    def save_raw_images_metrics(self):
+        """Saves raw image metrics to a CSV file."""
+        raw_metrics_all_images = self.assess_raw_images()
+        df_raw_metrics = pd.DataFrame(raw_metrics_all_images)
+        df_raw_metrics.to_csv('raw_image_metrics.csv', index=False)
