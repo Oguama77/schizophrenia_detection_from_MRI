@@ -1,8 +1,11 @@
+from logger import logger
+
 from utils.preprocessing import preprocess_images
 from utils.augmentation import augment_images
 from utils.dataset_preparation import prepare_dataset
 
 def main():
+    logger.info("The program started...")
     # Define paths
     raw_data_dir = "data/raw"
     preprocessed_dir = "data/processed"
@@ -24,5 +27,7 @@ def main():
     # Step 3: Dataset Preparation
     prepare_dataset(augmented_dir, train_set_dir, num_train_images)
 
+    logger.info("The program completed successfully.")
+    
 if __name__ == "__main__":
     main()
