@@ -1,7 +1,7 @@
 import os
 import torch
 import nibabel as nib
-from utils.preprocess import resample_image
+from utils.def_preprocess import resample_image
 
 # Paths
 input_dir = 'data'

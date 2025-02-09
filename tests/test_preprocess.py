@@ -8,14 +8,14 @@ from tempfile import NamedTemporaryFile
 from unittest.mock import patch, MagicMock
 
 # Import functions
-from ..src.utils.preprocess import load_nii 
-from utils.preprocess import get_data
-from utils.preprocess import get_affine
-from utils.preprocess import match_dimensions
-from utils.preprocess import resample_image
-from utils.preprocess import normalize_data, crop_to_largest_bounding_box, get_largest_brain_mask_slice
-from utils.preprocess import get_largest_brain_mask_slice
-from utils.preprocess import apply_gaussian_smoothing
+from ..src.utils.def_preprocess import load_nii 
+from utils.def_preprocess import get_data
+from utils.def_preprocess import get_affine
+from utils.def_preprocess import match_dimensions
+from utils.def_preprocess import resample_image
+from utils.def_preprocess import normalize_data, crop_to_largest_bounding_box, get_largest_brain_mask_slice
+from utils.def_preprocess import get_largest_brain_mask_slice
+from utils.def_preprocess import apply_gaussian_smoothing
 
 
 class TestLoadNii(unittest.TestCase):

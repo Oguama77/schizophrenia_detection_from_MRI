@@ -4,8 +4,8 @@ import os
 import pandas as pd
 import glob
 from unittest.mock import patch, MagicMock
-from utils.preprocess import load_nii
-from utils.data_loader import MRIDataset 
+from utils.def_preprocess import load_nii
+from utils.def_data_loader import MRIDataset 
 
 def mock_load_nii(file_path):
     """Mock function to simulate loading a NIfTI image."""

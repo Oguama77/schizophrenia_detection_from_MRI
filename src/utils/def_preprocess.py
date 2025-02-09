@@ -146,7 +146,7 @@ def resample_image(data: nib.Nifti1Image,
     ValueError: If voxel_size or output_format are invalid
     RuntimeError: If resampling fails
     """
-    if not isinstance(data, nib.Nifti1Image): # Ensure the image is a nibabel Nifti1Image
+    if not isinstance(data, nib.Nifti1Image):
         raise TypeError(f"Expected nib.Nifti1Image, got {type(data)}")
 
     if not isinstance(voxel_size, tuple) or len(voxel_size) != 3:
@@ -374,4 +374,4 @@ def apply_gaussian_smoothing(data,
         smoothed_data (numpy.ndarray): Smoothed 3D MRI data.
     """
     smoothed_data = gaussian_filter(data, sigma=sigma, order=order, mode=mode, cval=cval, truncate=truncate)
-    return smoothed_datas
+    return smoothed_data
