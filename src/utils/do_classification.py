@@ -3,11 +3,21 @@ from sklearn.svm import SVC
 from sklearn.preprocessing import StandardScaler
 import joblib
 import torch
+import numpy as np
 
 from sklearn.metrics import accuracy_score, classification_report, confusion_matrix, ConfusionMatrixDisplay
 from sklearn.metrics import roc_curve, roc_auc_score, auc
 
-def feature_classification_pipeline():
+def feature_classification_pipeline(
+        svc_kernel,
+        svc_c_value,
+        svc_gamma_value,
+        path_to_train_features,
+        path_to_train_labels,
+        path_to_test_features,
+        path_to_test_labels,
+        path_to_save_classifier: str = None,
+):
     """
     JUST NEED TO PROVIDE PATHS 
     TO FOLDER(S) CONTAINING TRAIN AND TEST FEATURES AND LABELS
@@ -16,13 +26,28 @@ def feature_classification_pipeline():
     """
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
+    train_features = np.load(path_to_train_features) # "train_features_sn.npy"
+    train_labels = np.load(path_to_train_labels) # "train_labels_sn.npy"
+
+    test_features = np.load(path_to_test_features) # "test_features_sn.npy"
+    test_labels = np.load(path_to_test_labels) # "test_labels_sn.npy"
+
     # Train an SVM on the extracted features
     print("Training SVM...")
-    svm_classifier = make_pipeline(StandardScaler(), SVC(kernel='rbf', probability=True, C= 100, gamma= 0.0001, random_state=42))
+    svm_classifier = make_pipeline(
+        StandardScaler(), 
+        SVC(
+            kernel=svc_kernel,  # 'rbf'
+            probability=True, 
+            C = svc_c_value, # 100
+            gamma = svc_gamma_value, # 0.0001
+            random_state=42
+            )
+            )
     svm_classifier.fit(train_features, train_labels)
 
     # Save the trained SVM model
-    joblib.dump(svm_classifier, "svm_classifier_bp_new.pkl")
+    joblib.dump(svm_classifier, path_to_save_classifier) # "svm_classifier_bp_new.pkl"
 
     # Evaluate on the test set
     print("Evaluating on test set...")

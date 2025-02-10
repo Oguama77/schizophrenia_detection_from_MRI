@@ -6,7 +6,6 @@ import pandas as pd
 from google.colab import drive
 from utils.def_data_loader import MRIDataset
 from torch.utils.data import DataLoader
-from itertools import chain
 from models.models import FeatureExtractor
 
 # Function to get image paths
@@ -46,68 +45,43 @@ def extract_features(loader, model, device): # not used currently
     labels = np.concatenate(labels, axis=0)
     return features, labels
 
-
-
-####
-def feature_extraction_pipeline():
+def feature_extraction_pipeline(
+        path_to_project_root_dir,
+        path_to_train_set_dir, 
+        path_to_test_set_dir,
+        path_to_labels_file,
+        ):
     """
     JUST NEED TO PROVIDE PATHS
     TO TRAINING AND TESTING FOLDERS
     AND A FILE FOR CLINICAL DATA FOR LABELS
     """
-
     drive.mount('/content/drive', force_remount=True)
 
-    os.chdir("drive/My Drive/python_ml")
+    os.chdir("drive/My Drive/" + path_to_project_root_dir)
 
-    # FROM CONIFIG!!!
-    folder_path_train1 = "best_pipeline_001"
-    folder_path_train2 = "best_pipeline_002"
-    folder_path_test = "best_pipeline_test_set"
-    label_file = "new_clinical_data.csv"
+    paths_to_train_data_samples = get_image_paths(path_to_train_set_dir)
+    paths_to_test_data_samples = get_image_paths(path_to_test_set_dir)
+    labels_df = pd.read_csv(path_to_labels_file)
 
-    train_path1 = get_image_paths(folder_path_train1)
-    train_path2 = get_image_paths(folder_path_train2)
-    test_paths = get_image_paths(folder_path_test)
-    labels_df = pd.read_csv(label_file)
+    train_dataset = MRIDataset(paths_to_train_data_samples, )
+    train_loader = DataLoader(train_dataset, batch_size=32, shuffle=True, collate_fn=collate_fn)
 
-    # Create datasets
-    train_dataset1 = MRIDataset(train_path1, labels_df)
-    train_dataset2 = MRIDataset(train_path2, labels_df)
-    test_dataset = MRIDataset(test_paths, labels_df)
-
+    test_dataset = MRIDataset(paths_to_test_data_samples, labels_df)
     test_loader = DataLoader(test_dataset, batch_size=32, shuffle=False, collate_fn=collate_fn)
-
-    # Create DataLoaders
-    train_loader1 = DataLoader(train_dataset1, batch_size=32, shuffle=True, collate_fn=collate_fn)
-    train_loader2 = DataLoader(train_dataset2, batch_size=32, shuffle=True, collate_fn=collate_fn)
-
-    train_loader = chain(train_loader1, train_loader2) # TODO: must be randomly distributed
-
 
     # Load feature extractor and move to GPU/CPU
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     feature_extractor = FeatureExtractor(base_model_name='resnet18').to(device)
 
-    # CONDITIONAL: LOAD FEATURES OT NOT
-    # Extract features for training set
+    # Extract or load features for training set # TODO: WHY DO WE NEED TO LOAD THE FEATURES???   
     print("Extracting features for training data...")
     train_features, train_labels = extract_features(train_loader, feature_extractor, device)
     np.save("train_features_sn.npy", train_features)
     np.save("train_labels_sn.npy", train_labels)
-
-    train_features = np.load("train_features_sn.npy")
-    train_labels = np.load("train_labels_sn.npy")
-
-    # CONDITIONAL: LOAD FEATURES OR NOT
+   
     # Extract features from test set
     print("Extracting features for test data...")
     test_features, test_labels = extract_features(test_loader, feature_extractor, device)
     np.save("test_features_sn.npy", test_features)
     np.save("test_labels_sn.npy", test_labels)
-
-
-    test_features = np.load("test_features_sn.npy")
-    test_labels = np.load("test_labels_sn.npy")
-
-    pass
