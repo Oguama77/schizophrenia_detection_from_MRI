@@ -2,7 +2,7 @@ import os
 import shutil
 import random
 import torch
-from utils.def_preprocess import load_nii, resample_image, normalize_data
+from src.utils.preprocess import load_nii, resample_image, normalize_data
 
 def prepare_dataset(
         train_ratio=0.8, 

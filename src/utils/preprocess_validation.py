@@ -7,7 +7,7 @@ from skimage.filters import threshold_otsu
 from skimage.metrics import mean_squared_error
 from skimage.metrics import structural_similarity as ssim
 
-from utils.def_preprocess import get_data, match_dimensions
+from src.utils.preprocess import get_data, match_dimensions
 
 
 def plot_slices(

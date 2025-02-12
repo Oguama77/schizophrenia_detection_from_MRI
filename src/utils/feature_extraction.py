@@ -4,7 +4,7 @@ import numpy as np
 import pandas as pd
 import tqdm
 from torch.utils.data import DataLoader
-from utils.def_data_loader import MRIDataset
+from src.utils.data_loader import MRIDataset
 from models.models import FeatureExtractor
 
 # TODO: ADD CORRECT TRAIN_SET_DIR, TEST_SET_DIR, LABELS_FILE, FEATURE_EXTRACTOR_MODEL, BATCH_SIZE, FEATURES_DIR

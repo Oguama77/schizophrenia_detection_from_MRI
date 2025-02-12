@@ -8,7 +8,7 @@ from tempfile import NamedTemporaryFile
 from unittest.mock import patch, MagicMock
 
 # Import functions
-from ..src.utils.def_preprocess import load_nii 
+from ..src.utils.preprocess import load_nii 
 from utils.def_preprocess import get_data
 from utils.def_preprocess import get_affine
 from utils.def_preprocess import match_dimensions

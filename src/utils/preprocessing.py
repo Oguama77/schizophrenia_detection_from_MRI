@@ -1,6 +1,6 @@
 import os
 import torch
-from utils.def_preprocess import normalize_data, extract_brain, crop_to_largest_bounding_box, apply_gaussian_smoothing
+from src.utils.preprocess import normalize_data, extract_brain, crop_to_largest_bounding_box, apply_gaussian_smoothing
 
 def preprocess_images(
         normalize=False, 

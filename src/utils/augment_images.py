@@ -1,7 +1,7 @@
 import os
 import torch
 import random
-from utils.def_augmentations import apply_translation, apply_rotation, apply_gaussian_noise
+from src.utils.augmentations import apply_translation, apply_rotation, apply_gaussian_noise
 
 def augment_images(
         augmentations, 
