@@ -20,7 +20,7 @@ class FeatureExtractor(nn.Module):
         """
         Initializes the FeatureExtractor.
 
-        Args:
+        Parameters:
             base_model_name (str): The name of the base model to use (default: 'resnet18').
             weights (torchvision.models.Weights): Pretrained weights for the base model.
             input_channels (int): Number of input channels for the first convolutional layer.
@@ -50,7 +50,7 @@ class FeatureExtractor(nn.Module):
         """
         Forward pass of the feature extractor.
 
-        Args:
+        Parameters:
             x (torch.Tensor): Input tensor of shape (batch_size, input_channels, height, width).
 
         Returns:

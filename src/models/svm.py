@@ -24,7 +24,7 @@ class SVMClassifier:
         """
         Initializes the SVM classifier with specified hyperparameters.
 
-        Args:
+        Parameters:
             kernel (str): Specifies the kernel type to be used in the SVM (default: 'rbf').
             C (float): Regularization parameter (default: 100).
             gamma (float): Kernel coefficient (default: 0.0001).
@@ -43,7 +43,7 @@ class SVMClassifier:
         """
         Trains the SVM classifier on the given training data.
 
-        Args:
+        Parameters:
             train_features (np.ndarray): Feature matrix of shape (num_samples, num_features).
             train_labels (np.ndarray): Target labels of shape (num_samples,).
         """
@@ -53,7 +53,7 @@ class SVMClassifier:
         """
         Predicts class labels for the given test features.
 
-        Args:
+        Parameters:
             test_features (np.ndarray): Feature matrix of shape (num_samples, num_features).
 
         Returns:
@@ -65,7 +65,7 @@ class SVMClassifier:
         """
         Returns probability estimates for the given test features.
 
-        Args:
+        Parameters:
             test_features (np.ndarray): Feature matrix of shape (num_samples, num_features).
 
         Returns:
@@ -77,7 +77,7 @@ class SVMClassifier:
         """
         Saves the trained model to a file.
 
-        Args:
+        Parameters:
             file_path (str): Path to save the model.
         """
         joblib.dump(self.pipeline, file_path)
@@ -87,7 +87,7 @@ class SVMClassifier:
         """
         Loads a trained model from a file.
 
-        Args:
+        Parameters:
             file_path (str): Path to the saved model file.
 
         Returns:

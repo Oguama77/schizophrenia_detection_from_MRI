@@ -1,12 +1,12 @@
 from logger import logger
 from omegaconf import OmegaConf
-
 from utils.eda import SchizophreniaEDA
-from utils.do_dataset_preparation import prepare_dataset
-from utils.do_preprocessing import preprocess_images
-from utils.do_augmentation import augment_images
-from utils.do_feature_extraction import feature_extraction_pipeline
-from utils.do_classification import feature_classification_pipeline
+from utils.dataset_preparation import prepare_dataset
+from utils.preprocessing import preprocess_images
+from utils.augmentations import augment_images
+from utils.feature_extraction import feature_extraction_pipeline
+from utils.classifier import feature_classification_pipeline
+
 
 def main():
     logger.info("The program started...")
@@ -23,12 +23,12 @@ def main():
     TRAIN_SET_DIR = config_data.file_paths.train_set_dir
     TEST_SET_DIR = config_data.file_paths.test_set_dir
 
-    PREPROCESSING_STEPS = config_data.dataset_preparation.preprocessing_steps # ["resample", "normalize", "extract_brain"]
-    AUGMENTATION_STEPS = config_data.dataset_preparation.augmentation_steps # "translation"  # Options: 'translation', 'rotation', 'gaussian_noise'
-    HOW_MANY_AUGMENTATIONS = config_data.dataset_preparation.how_many_augmentations # 4
-    TRAIN_SET_RATIO = config_data.dataset_preparation.train_set_ratio # 0.24: 50 - train, 12 - test
-    NORMALIZE_DEFAULT = config_data.dataset_preparation.normalize_default # True False
-    NORMALIZATION_METHOD = config_data.dataset_preparation.normalization_method # min-max
+    PREPROCESSING_STEPS = config_data.dataset_preparation.preprocessing_steps  # ["resample", "normalize", "extract_brain"]
+    AUGMENTATION_STEPS = config_data.dataset_preparation.augmentation_steps  # "translation"  # Options: 'translation', 'rotation', 'gaussian_noise'
+    HOW_MANY_AUGMENTATIONS = config_data.dataset_preparation.how_many_augmentations  # 4
+    TRAIN_SET_RATIO = config_data.dataset_preparation.train_set_ratio  # 0.24: 50 - train, 12 - test
+    NORMALIZE_DEFAULT = config_data.dataset_preparation.normalize_default  # True False
+    NORMALIZATION_METHOD = config_data.dataset_preparation.normalization_method  # min-max
 
     NORMALIZE_WHEN_PREPROCESS = config_data.preprocessing_params.normalize_when_preprocess
     DO_BRAIN_EXTRACTION = config_data.preprocessing_params.do_brain_exaction
@@ -63,8 +63,6 @@ def main():
     GAMMA = config_data.svc_params.gamma
     RANDOM_STATE = config_data.svc_params.random_state
 
-    
-
     # Step 0: Explanatory data analysis
     """
     Performs an explanatory data analysis on the raw images and corresponding clinical data.
@@ -84,12 +82,11 @@ def main():
 
     UPDATE: for smoother workflow, before copying the images, it resamples and normalizes them.
     """
-    prepare_dataset(
-        train_ratio=TRAIN_SET_RATIO, 
-        raw_pt_dir=RAW_PT_DATA_DIR, 
-        raw_nii_dir=RAW_NII_DATA_DIR, 
-        normalize=NORMALIZE_DEFAULT, 
-        norm_method=NORMALIZATION_METHOD)
+    prepare_dataset(train_ratio=TRAIN_SET_RATIO,
+                    raw_pt_dir=RAW_PT_DATA_DIR,
+                    raw_nii_dir=RAW_NII_DATA_DIR,
+                    normalize=NORMALIZE_DEFAULT,
+                    norm_method=NORMALIZATION_METHOD)
     logger.info("Dataset preparation completed.")
 
     # Step 2: Preprocessing
@@ -103,14 +100,12 @@ def main():
     Test images located in /data/test_set are also resampled and normalized for consistency,
     Saves preprocessed test images in /data/test_set/preprocessed.
     """
-    preprocess_images(
-        normalize=NORMALIZE_WHEN_PREPROCESS,
-        brain_extraction=DO_BRAIN_EXTRACTION,
-        crop=DO_CROP,
-        smooth=DO_SMOOTH,
-        re_normalize_after_smooth=DO_RE_NORMALIZE_AFTER_SMOOTH,
-        preprocess_test=PREPROCESS_TEST_SET
-        )
+    preprocess_images(normalize=NORMALIZE_WHEN_PREPROCESS,
+                      brain_extraction=DO_BRAIN_EXTRACTION,
+                      crop=DO_CROP,
+                      smooth=DO_SMOOTH,
+                      re_normalize_after_smooth=DO_RE_NORMALIZE_AFTER_SMOOTH,
+                      preprocess_test=PREPROCESS_TEST_SET)
     logger.info("Preprocessing completed.")
 
     # Step 3: Augmentation
@@ -121,14 +116,20 @@ def main():
     """
     augment_images(
         augmentations=[
-            ("translation", {"shift": (5, 5)}), 
-            ("rotation", {"angle": 15}),
-            ("gaussian_noise", {"std": 0.1}),
+            ("translation", {
+                "shift": (5, 5)
+            }),
+            ("rotation", {
+                "angle": 15
+            }),
+            ("gaussian_noise", {
+                "std": 0.1
+            }),
         ],
         num_augmentations=HOW_MANY_AUGMENTATIONS,
         input_dir=PREPROCESSED_DATA_DIR,
         output_dir=AUGMENTED_DATA_DIR,
-        )
+    )
     logger.info("Augmentation completed.")
 
     # Step 4: Feature extraction stage (ResNet)
@@ -157,6 +158,7 @@ def main():
     """
 
     logger.info("The program completed successfully.")
+
 
 if __name__ == "__main__":
     main()
