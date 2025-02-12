@@ -1,9 +1,9 @@
-import torch
 import torch.nn as nn
 from torchvision import models
 from sklearn.svm import SVC
 from sklearn.pipeline import make_pipeline
 from sklearn.preprocessing import StandardScaler
+
 
 # ResNet-18 for Feature Extraction
 class FeatureExtractor(nn.Module):
