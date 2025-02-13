@@ -1,53 +1,83 @@
 import os
 import json
 import numpy as np
-import torch
-import joblib
-from sklearn.svm import SVC
-from sklearn.preprocessing import StandardScaler
-from sklearn.pipeline import make_pipeline
+import logging
 from sklearn.metrics import accuracy_score, classification_report, roc_auc_score, confusion_matrix
+from src.models.svm import SVMClassifier
 
-# TODO: ADD CORRECT FEATURES_DIR
+# Configure logging
+logging.basicConfig(level=logging.INFO,
+                    format="%(asctime)s - %(levelname)s - %(message)s")
 
-def load_features():
-    """Loads extracted features and labels."""
-    train_features = np.load(os.path.join(FEATURES_DIR, "train_features.npy"))
-    train_labels = np.load(os.path.join(FEATURES_DIR, "train_labels.npy"))
-    test_features = np.load(os.path.join(FEATURES_DIR, "test_features.npy"))
-    test_labels = np.load(os.path.join(FEATURES_DIR, "test_labels.npy"))
+# Define paths
+FEATURES_DIR = "path/to/save/features"
+MODEL_PATH = "path/to/save/model.pkl"
+
+
+def load_features(
+    features_dir: str = FEATURES_DIR
+) -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
+    """
+    Loads extracted features and labels from disk.
+
+    Parameters:
+        features_dir (str): Path to the directory containing feature files.
+
+    Returns:
+        tuple: (train_features, train_labels, test_features, test_labels)
+
+    Raises:
+        FileNotFoundError: If any of the required feature files are missing.
+    """
+    try:
+        train_features = np.load(
+            os.path.join(features_dir, "train_features.npy"))
+        train_labels = np.load(os.path.join(features_dir, "train_labels.npy"))
+        test_features = np.load(os.path.join(features_dir,
+                                             "test_features.npy"))
+        test_labels = np.load(os.path.join(features_dir, "test_labels.npy"))
+    except FileNotFoundError as e:
+        logging.error(f"Feature file not found: {e}")
+        raise
+
     return train_features, train_labels, test_features, test_labels
 
-def train_and_evaluate():
-    """Trains a classifier and evaluates it on the test set."""
-    train_X, train_y, test_X, test_y = load_features()
 
-    # Train classifier (Support Vector Machine)
-    clf = make_pipeline(
-        StandardScaler(), 
-        SVC(
-            kernel=svc_kernel,  # 'rbf'
-            probability=True, 
-            C = svc_c_value, # 100
-            gamma = svc_gamma_value, # 0.0001
-            random_state=42
-            )
-            )
-    clf.fit(train_X, train_y)
+def train_and_evaluate(model_path: str = MODEL_PATH,
+                       features_dir: str = FEATURES_DIR) -> None:
+    """
+    Trains an SVM classifier on extracted features and evaluates it on a test set.
 
-    joblib.dump(clf, path_to_save_classifier) # "svm_classifier_bp_new.pkl"
+    Parameters:
+        model_path (str): Path to save the trained model.
+        features_dir (str): Path where feature files are stored.
 
-    # Make predictions
-    test_preds = clf.predict(test_X)
-    test_probs = clf.predict_proba(test_X)[:, 1]  # Get probabilities for ROC AUC
+    Returns:
+        None
+    """
+    logging.info("Loading extracted features...")
+    X_train, y_train, X_test, y_test = load_features(features_dir)
+
+    # Train SVM classifier
+    logging.info("Training SVM classifier...")
+    classifier = SVMClassifier()
+    classifier.train(X_train, y_train)
+
+    # Save trained model
+    classifier.save_model(model_path)
+    logging.info(f"Model saved to {model_path}")
+
+    # Make predictions and get decision function for ROC AUC
+    test_preds = classifier.predict(X_test)
+    test_scores = classifier.decision_function(X_test)
 
     # Compute evaluation metrics
-    acc = accuracy_score(test_y, test_preds)
-    auc = roc_auc_score(test_y, test_probs)
-    report = classification_report(test_y, test_preds, output_dict=True)
-    conf_matrix = confusion_matrix(test_y, test_preds)
+    acc = accuracy_score(y_test, test_preds)
+    auc = roc_auc_score(y_test, test_scores)
+    report = classification_report(y_test, test_preds, output_dict=True)
+    conf_matrix = confusion_matrix(y_test, test_preds)
 
-    # Save results for visualization
+    # Save results
     results = {
         "accuracy": acc,
         "roc_auc": auc,
@@ -55,8 +85,8 @@ def train_and_evaluate():
         "confusion_matrix": conf_matrix.tolist()
     }
 
-    results_path = os.path.join(FEATURES_DIR, "classification_results.json")
+    results_path = os.path.join(features_dir, "classification_results.json")
     with open(results_path, "w") as f:
         json.dump(results, f, indent=4)
 
-    print(f"Classification results saved to {results_path}")
+    logging.info(f"Classification results saved to {results_path}")
