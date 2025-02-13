@@ -1,5 +1,4 @@
 from typing import Union
-
 import matplotlib.pyplot as plt
 import nibabel as nib
 import numpy as np
@@ -10,13 +9,11 @@ from skimage.metrics import structural_similarity as ssim
 from src.utils.preprocess import get_data, match_dimensions
 
 
-def plot_slices(
-    data: Union[np.ndarray, nib.Nifti1Image],
-    how_many: int = 4,
-    title: str = "",
-    axes: list = None,
-    isSave_fig: bool = False
-    ) -> None:
+def plot_slices(data: Union[np.ndarray, nib.Nifti1Image],
+                how_many: int = 4,
+                title: str = "",
+                axes: list = None,
+                isSave_fig: bool = False) -> None:
     """
     Plot N evenly spaced slices along the z-axis (axis 2) of the MRI volume (excluding the edge cases).
     Plot slices on provided axes or create a new figure if axes are not provided.
@@ -32,21 +29,23 @@ def plot_slices(
     if not isinstance(data, (np.ndarray, nib.Nifti1Image)):
         raise TypeError(
             f"Input data must be a numpy array or a NIfTI image, got {type(data)}"
-            )
+        )
 
     if data.ndim != 3:  # Ensure data is 3 dimensional
-        raise ValueError(f"Input data must be a 3D numpy array, got {data.ndim}")
+        raise ValueError(
+            f"Input data must be a 3D numpy array, got {data.ndim}")
 
     if how_many < 1 or how_many * 2 > data.shape[2]:
         raise ValueError(
             f"Number of slices to plot must be between 1 and the total number of slices, got {how_many}"
-            )
+        )
 
     try:
         if not isinstance(data, np.ndarray):
             data = get_data(data)
         z_dim = data.shape[2]  # Size along the z-axis
-        slice_indices = np.linspace(0, z_dim - 1, how_many * 2, dtype=int)  # Select evenly spaced slices
+        slice_indices = np.linspace(0, z_dim - 1, how_many * 2,
+                                    dtype=int)  # Select evenly spaced slices
 
         # Handle both odd and even values of how_many
         start_index = (len(slice_indices) - how_many) // 2
@@ -54,7 +53,8 @@ def plot_slices(
         slice_indices = slice_indices[start_index:end_index]
 
         if len(slice_indices) != how_many:
-            raise ValueError("Calculated slice indices do not match `how_many`")
+            raise ValueError(
+                "Calculated slice indices do not match `how_many`")
 
         if axes is None:
             fig, axes = plt.subplots(1, how_many, figsize=(20, 5))
@@ -97,8 +97,9 @@ def calculate_snr(data: np.ndarray, eps: float = 1e-6) -> float:
     if not isinstance(data, np.ndarray):
         raise TypeError(f"Input data must be a numpy array, got {type(data)}")
 
-    if data.ndim!= 3:
-        raise ValueError(f"Input data must be a 3D numpy array, got {data.ndim}")
+    if data.ndim != 3:
+        raise ValueError(
+            f"Input data must be a 3D numpy array, got {data.ndim}")
 
     if data.size == 0:
         raise ValueError("Input data should not be empty")
@@ -114,7 +115,8 @@ def calculate_snr(data: np.ndarray, eps: float = 1e-6) -> float:
     return signal / max(noise, eps)
 
 
-def visualize_signal_mask(data: np.ndarray, mask: np.ndarray, slice_index: int):
+def visualize_signal_mask(data: np.ndarray, mask: np.ndarray,
+                          slice_index: int):
     """
     Visualize the original data and the generated mask for a specific slice.
     """
@@ -129,11 +131,9 @@ def visualize_signal_mask(data: np.ndarray, mask: np.ndarray, slice_index: int):
     plt.show()
 
 
-def generate_signal_mask(
-    data: np.ndarray, 
-    otsu_scaling: float = 1.0, 
-    min_intensity_factor: float = 0.1
-    ) -> np.ndarray:
+def generate_signal_mask(data: np.ndarray,
+                         otsu_scaling: float = 1.0,
+                         min_intensity_factor: float = 0.1) -> np.ndarray:
     """
     Combine Otsu's thresholding with an intensity-based threshold for mask generation.
     """
@@ -142,7 +142,7 @@ def generate_signal_mask(
     if non_zero_data.size == 0:
         print(
             "Warning: No non-zero data found for thresholding. Returning a zero mask."
-            )
+        )
         return np.zeros_like(data, dtype=np.uint8)
 
     otsu_threshold = threshold_otsu(data[data > 0]) * otsu_scaling
@@ -151,7 +151,9 @@ def generate_signal_mask(
     return (data >= combined_threshold).astype(np.uint8)
 
 
-def calculate_snr_with_mask(data: np.ndarray, mask=None, eps: float = 1e-6) -> float:
+def calculate_snr_with_mask(data: np.ndarray,
+                            mask=None,
+                            eps: float = 1e-6) -> float:
     """
     Calculate the SNR using a mask to focus on the brain region.
 
@@ -171,14 +173,17 @@ def calculate_snr_with_mask(data: np.ndarray, mask=None, eps: float = 1e-6) -> f
 
     # Check if the mask has any valid signal region
     if np.sum(mask) == 0:
-        print("Warning: The mask contains no signal region. Assigning SNR value of 0.")
+        print(
+            "Warning: The mask contains no signal region. Assigning SNR value of 0."
+        )
         return 0.0
 
     signal = np.mean(data[mask > 0])
     noise = np.std(data[mask == 0])
 
     if noise == 0:
-        raise ValueError("Standard deviation (noise) is zero, SNR cannot be computed.")
+        raise ValueError(
+            "Standard deviation (noise) is zero, SNR cannot be computed.")
 
     return signal / max(noise, eps)
 
@@ -201,10 +206,12 @@ def calculate_mse(data1: np.ndarray, data2: np.ndarray) -> float:
     if not isinstance(data1, np.ndarray) or not isinstance(data2, np.ndarray):
         raise TypeError(
             f"Input data must be numpy arrays, got {type(data1)} and {type(data2)}"
-            )
+        )
 
-    if data1.ndim!= 3 or data2.ndim!= 3:
-        raise ValueError(f"Input data must be 3D numpy arrays, got {data1.ndim} and {data2.ndim}")
+    if data1.ndim != 3 or data2.ndim != 3:
+        raise ValueError(
+            f"Input data must be 3D numpy arrays, got {data1.ndim} and {data2.ndim}"
+        )
 
     if data1.size == 0 or data2.size == 0:
         raise ValueError("Input data should not be empty")
@@ -212,7 +219,9 @@ def calculate_mse(data1: np.ndarray, data2: np.ndarray) -> float:
     return mean_squared_error(data1.flatten(), data2.flatten())
 
 
-def calculate_psnr(data1: np.ndarray, data2: np.ndarray, mse: float = None) -> float:
+def calculate_psnr(data1: np.ndarray,
+                   data2: np.ndarray,
+                   mse: float = None) -> float:
     """
     Calculate the Peak Signal-to-Noise Ratio (PSNR) between two MRI volumes.
 
@@ -230,10 +239,12 @@ def calculate_psnr(data1: np.ndarray, data2: np.ndarray, mse: float = None) -> f
     if not isinstance(data1, np.ndarray) or not isinstance(data2, np.ndarray):
         raise TypeError(
             f"Input data must be numpy arrays, got {type(data1)} and {type(data2)}"
-            )
+        )
 
-    if data1.ndim!= 3 or data2.ndim!= 3:
-        raise ValueError(f"Input data must be 3D numpy arrays, got {data1.ndim} and {data2.ndim}")
+    if data1.ndim != 3 or data2.ndim != 3:
+        raise ValueError(
+            f"Input data must be 3D numpy arrays, got {data1.ndim} and {data2.ndim}"
+        )
 
     if data1.size == 0 or data2.size == 0:
         raise ValueError("Input data should not be empty")
@@ -244,13 +255,13 @@ def calculate_psnr(data1: np.ndarray, data2: np.ndarray, mse: float = None) -> f
     if mse == 0:
         raise ValueError(
             "Mean Squared Error (MSE) of the data is zero, PSNR cannot be computed"
-            )
+        )
 
     max_intensity = np.max(data1)
     if max_intensity == 0:
         raise ValueError(
             "Maximum intensity value in the data is zero, PSNR cannot be computed"
-            )
+        )
 
     psnr = 20 * np.log10(max_intensity / np.sqrt(mse))
     return psnr
@@ -261,7 +272,7 @@ def calculate_relative_psnr_with_mask(
     mask: np.ndarray = None,
     max_intensity: float = None,
     eps: float = 1e-6,
-    ) -> float:
+) -> float:
     """
     Calculate a relative PSNR based on the difference between signal and noise,
     focusing only on the regions defined by the mask.
@@ -283,8 +294,7 @@ def calculate_relative_psnr_with_mask(
 
     if not isinstance(data, np.ndarray) or not isinstance(mask, np.ndarray):
         raise TypeError(
-            f"Inputs must be numpy arrays, got {type(data)} and {type(mask)}"
-            )
+            f"Inputs must be numpy arrays, got {type(data)} and {type(mask)}")
 
     if data.size == 0 or mask.size == 0:
         raise ValueError("Input data or mask cannot be empty")
@@ -307,18 +317,21 @@ def calculate_relative_psnr_with_mask(
     noise = np.std(noise_region)
 
     if noise == 0:
-        raise ValueError("Noise (standard deviation) is zero; PSNR cannot be computed.")
+        raise ValueError(
+            "Noise (standard deviation) is zero; PSNR cannot be computed.")
 
     # Compute Mean Squared Error (MSE) based on the signal and noise
-    mse = np.mean((signal_region - signal) ** 2)
+    mse = np.mean((signal_region - signal)**2)
 
     # PSNR calculation
-    psnr = 20 * np.log10(max_intensity / (np.sqrt(mse) + eps))  # Add eps to prevent log of zero
+    psnr = 20 * np.log10(
+        max_intensity / (np.sqrt(mse) + eps))  # Add eps to prevent log of zero
 
     return psnr
 
 
-def calculate_relative_psnr(data: np.ndarray, max_intensity: float = None) -> float:
+def calculate_relative_psnr(data: np.ndarray,
+                            max_intensity: float = None) -> float:
     """
     Calculate a relative PSNR using the maximum intensity value as the ideal reference.
 
@@ -342,16 +355,18 @@ def calculate_relative_psnr(data: np.ndarray, max_intensity: float = None) -> fl
     if max_intensity is None:
         max_intensity = data.max()
 
-    mse = np.mean((data - data.mean()) ** 2)  # max_intensity
+    mse = np.mean((data - data.mean())**2)  # max_intensity
     if mse == 0:
-        raise ValueError("Mean Squared Error (MSE) is zero; PSNR cannot be computed")
+        raise ValueError(
+            "Mean Squared Error (MSE) is zero; PSNR cannot be computed")
 
     psnr = 20 * np.log10(max_intensity / np.sqrt(mse))
     return psnr
 
 
-def calculate_relative_psnr2(
-    data: np.ndarray, max_intensity: float = None, eps: float = 1e-6) -> float:
+def calculate_relative_psnr2(data: np.ndarray,
+                             max_intensity: float = None,
+                             eps: float = 1e-6) -> float:
     """
     Calculate a relative PSNR based on the difference between signal and noise,
     with a focus on meaningful signal (brain regions in the case of MRI).
@@ -380,13 +395,15 @@ def calculate_relative_psnr2(
     noise = np.std(data)
 
     if noise == 0:
-        raise ValueError("Noise (standard deviation) is zero; PSNR cannot be computed.")
+        raise ValueError(
+            "Noise (standard deviation) is zero; PSNR cannot be computed.")
 
     # Compute Mean Squared Error (MSE) based on the signal and noise
-    mse = np.mean((data - signal) ** 2)
+    mse = np.mean((data - signal)**2)
 
     # PSNR calculation
-    psnr = 20 * np.log10(max_intensity / (np.sqrt(mse) + eps))  # Add eps to prevent log of zero
+    psnr = 20 * np.log10(
+        max_intensity / (np.sqrt(mse) + eps))  # Add eps to prevent log of zero
 
     # Return PSNR value
     return psnr
@@ -420,7 +437,7 @@ def calculate_cnr(data: np.ndarray, mask: np.ndarray = None) -> float:
         # return 0
         raise ValueError(
             "Noise (standard deviation of the background) is zero, CNR cannot be computed."
-            )
+        )
 
     cnr = np.abs(signal - background) / noise
     return cnr
@@ -440,11 +457,12 @@ def calculate_rmse(data: np.ndarray, reference: np.ndarray) -> float:
     if data.shape != reference.shape:
         raise ValueError("Data and reference must have the same shape.")
 
-    rmse = np.sqrt(np.mean((data - reference) ** 2))
+    rmse = np.sqrt(np.mean((data - reference)**2))
     return rmse
 
 
-def calculate_relative_rmse(data: np.ndarray, max_intensity: float = None) -> float:
+def calculate_relative_rmse(data: np.ndarray,
+                            max_intensity: float = None) -> float:
     """
     Calculate the Root Mean Square Error (RMSE) between the data and the reference (filled with max intensity).
 
@@ -456,13 +474,14 @@ def calculate_relative_rmse(data: np.ndarray, max_intensity: float = None) -> fl
         float: RMSE value.
     """
     if max_intensity is None:
-        max_intensity = np.max(data)  # Use max intensity from data if not provided
+        max_intensity = np.max(
+            data)  # Use max intensity from data if not provided
 
     # Create reference image filled with max_intensity
     reference = np.full_like(data, max_intensity)
 
     # Compute RMSE
-    rmse = np.sqrt(np.mean((data - reference) ** 2))
+    rmse = np.sqrt(np.mean((data - reference)**2))
     return rmse
 
 
@@ -484,10 +503,12 @@ def calculate_ssim(data1: np.ndarray, data2: np.ndarray) -> float:
     if not isinstance(data1, np.ndarray) or not isinstance(data2, np.ndarray):
         raise TypeError(
             f"Input data must be numpy arrays, got {type(data1)} and {type(data2)}"
-            )
+        )
 
-    if data1.ndim!= 3 or data2.ndim!= 3:
-        raise ValueError(f"Input data must be 3D numpy arrays, got {data1.ndim} and {data2.ndim}")
+    if data1.ndim != 3 or data2.ndim != 3:
+        raise ValueError(
+            f"Input data must be 3D numpy arrays, got {data1.ndim} and {data2.ndim}"
+        )
 
     if data1.size == 0 or data2.size == 0:
         raise ValueError("Input data should not be empty")
@@ -495,10 +516,9 @@ def calculate_ssim(data1: np.ndarray, data2: np.ndarray) -> float:
     return ssim(data1, data2, data_range=data1.max() - data1.min())
 
 
-def calculate_metrics(reference_data: np.ndarray = None, 
-                      modified_data: np.ndarray = None, 
-                      preprocessing_step: str = None
-                      ) -> dict:
+def calculate_metrics(reference_data: np.ndarray = None,
+                      modified_data: np.ndarray = None,
+                      preprocessing_step: str = None) -> dict:
     """
     Calculate various metrics for comparing the reference data with the modified data.
 
@@ -520,13 +540,15 @@ def calculate_metrics(reference_data: np.ndarray = None,
         modified_data_matched = match_dimensions(reference_data, modified_data)
 
         mse_value = calculate_mse(reference_data, modified_data_matched)
-        psnr_value = calculate_psnr(reference_data, modified_data_matched, mse=mse_value)
+        psnr_value = calculate_psnr(reference_data,
+                                    modified_data_matched,
+                                    mse=mse_value)
         ssim_value = calculate_ssim(reference_data, modified_data_matched)
     else:
         mse_value = -1
         psnr_value = -1
         ssim_value = -1
-        
+
     snr_value = calculate_snr_with_mask(modified_data)
     cnr_value = calculate_cnr(modified_data)
 
@@ -542,12 +564,15 @@ def calculate_metrics(reference_data: np.ndarray = None,
         "ssim": ssim_value,
         "relative_psnr": relative_psnr_value,
         "relative_rmse": relative_rmse_value,
-        }
+    }
 
     return results_metrics
 
 
-def plot_histogram(data: np.ndarray, bins: int = 50, title="", ax=None) -> None:
+def plot_histogram(data: np.ndarray,
+                   bins: int = 50,
+                   title="",
+                   ax=None) -> None:
     """
     Plot the histogram of the MRI volume intensities.
     Plot the histogram on the provided axis or create a new figure if none is provided.
@@ -563,8 +588,9 @@ def plot_histogram(data: np.ndarray, bins: int = 50, title="", ax=None) -> None:
     if not isinstance(data, np.ndarray):
         raise TypeError(f"Input data must be a numpy array, got {type(data)}")
 
-    if data.ndim!= 3:
-        raise ValueError(f"Input data must be a 3D numpy array, got {data.ndim}")
+    if data.ndim != 3:
+        raise ValueError(
+            f"Input data must be a 3D numpy array, got {data.ndim}")
 
     if data.size == 0:
         raise ValueError("Input data should not be empty")
@@ -591,5 +617,4 @@ def validate_data_shape(data: np.ndarray, expected_shape: tuple) -> None:
     - expected_shape (tuple): Expected shape of the input data.
     """
     assert data.shape == expected_shape, (
-        f"Shape mismatch: {data.shape} != {expected_shape}"
-    )
+        f"Shape mismatch: {data.shape} != {expected_shape}")

@@ -29,6 +29,9 @@ class SVMClassifier:
             C (float): Regularization parameter (default: 100).
             gamma (float): Kernel coefficient (default: 0.0001).
             random_state (int): Controls randomness (default: 42).
+        
+        Returns:
+            None
         """
         self.pipeline = make_pipeline(
             StandardScaler(),
@@ -46,6 +49,9 @@ class SVMClassifier:
         Parameters:
             train_features (np.ndarray): Feature matrix of shape (num_samples, num_features).
             train_labels (np.ndarray): Target labels of shape (num_samples,).
+            
+        Returns:
+            None
         """
         self.pipeline.fit(train_features, train_labels)
 
@@ -79,6 +85,9 @@ class SVMClassifier:
 
         Parameters:
             file_path (str): Path to save the model.
+            
+        Returns:
+            None
         """
         joblib.dump(self.pipeline, file_path)
 
