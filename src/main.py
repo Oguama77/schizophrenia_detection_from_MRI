@@ -17,9 +17,11 @@ def main():
     config_data = OmegaConf.load('config/config.yaml')
 
     # Accessing parameters
-    CLINICAL_DATA_DIR = config_data.file_paths.clinical_data_dir
-    RAW_PT_DATA_DIR = config_data.file_paths.raw_pt_data_dir
-    RAW_NII_DATA_DIR = config_data.file_paths.raw_nii_data_dir
+    RAW_PT_DATA_DIR = config_data.base.raw_pt_data_dir
+    RAW_NII_DATA_DIR = config_data.base.raw_nii_data_dir
+
+    CLINICAL_DATA_DIR = config_data.eda.clinical_data_dir
+    IS_PERFORM_EDA = config_data.eda.is_perform_eda
 
     #PREPROCESSING_STEPS = config_data.dataset_preparation.preprocessing_steps  # ["resample", "normalize", "extract_brain"]
     #AUGMENTATION_STEPS = config_data.dataset_preparation.augmentation_steps  # "translation"  # Options: 'translation', 'rotation', 'gaussian_noise'
@@ -72,24 +74,30 @@ def main():
 
     # Step 0: Explanatory data analysis
     """
-    Performs an explanatory data analysis on the raw images and corresponding clinical data.
+    Performs an explanatory data analysis on the raw images (data/raw_pt)
+    and corresponding clinical data (data/clinical_data.csv).
     This step is optional and can be skipped if not necessary.
     """
-    eda = SchizophreniaEDA(CLINICAL_DATA_DIR, RAW_PT_DATA_DIR)
-    eda.plot_age_distribution()
-    eda.plot_gender_distribution()
-    eda.get_age_statistics()
-    eda.save_raw_images_metrics()
-    logger.info("EDA completed.")
+    if IS_PERFORM_EDA:
+        eda = SchizophreniaEDA(CLINICAL_DATA_DIR, RAW_PT_DATA_DIR)
+        eda.plot_age_distribution()
+        eda.plot_gender_distribution()
+        eda.get_age_statistics()
+        eda.save_raw_images_metrics()
+        logger.info("EDA completed.")
+    else:
+        logger.info("EDA was skipped.")    
 
     # Step 1: Select the data (train, test)
     """
-    Randomly divides (ratio is user defined) images located in /data/raw,
-    Creates 2 folders: train_set, test_set,
+    Randomly divides (ratio is user defined) images located in /data/raw_nii,
+    Creates 2 folders: data/raw_nii/train_set, data/raw_nii/test_set,
     Copy-pastes previously divided images into these folders (e.g. 50 images into train, 12 images into test),
-    Original images are kept intact in /data/raw.
+    Images are saved in a PyTorch format - .pt
+    Original images are kept intact in data/raw_nii.
 
-    UPDATE: for smoother workflow, before copying the images, it resamples and normalizes them.
+    For smoother workflow, before copying the images, 
+    it resamples and normalizes them (both train and test sets).
     """
     prepare_dataset(train_ratio=TRAIN_SET_RATIO,
                     raw_pt_dir=RAW_PT_DATA_DIR,
@@ -105,14 +113,17 @@ def main():
 
     # Step 2: Preprocessing
     """
-    Preprocesses images located in /data/train_set,
-    Resamples to a common voxel size,
-    Normalizes intensity values,
-    Extracts brain regions using a custom algorithm,
-    Saves preprocessed images in /data/train_set/preprocessed.
+    Preprocesses images located in data/raw_nii/train_set,
+    Resamples to a common voxel size (if not done in the previous step),
+    Normalizes intensity values (if not done in the previous step),
+    Extracts brain regions using a custom algorithm (user-defined option),
+    Crops the image (user-defined option),
+    Smooths the image (user-defined option),
+    Saves preprocessed images in data/raw_nii/train_set/preprocessed.
 
-    Test images located in /data/test_set are also resampled and normalized for consistency,
-    Saves preprocessed test images in /data/test_set/preprocessed.
+    Test images located in data/raw_nii/test_set 
+    may also be resampled and normalized for consistency (user-defined option),
+    Saves preprocessed test images in data/raw_nii/test_set/preprocessed.
     """
     preprocess_images(normalize=IS_NORMALIZE_WHEN_PREPROCESS,
                       norm_metod=NORMALIZATION_METHOD,
@@ -137,8 +148,8 @@ def main():
     # Step 3: Augmentation
     """
     Applies specified augmentation type (translation, rotation, gaussian_noise, or combined)
-    to the preprocessed images located in /data/train_set/preprocessed,
-    Saves augmented images in /data/train_set/preprocessed/augmented.
+    to the preprocessed train set images located in data/raw_nii/train_set/preprocessed,
+    Saves augmented images in data/raw_nii/train_set/preprocessed/augmented.
     """
     augment_images(
         augmentations=[
@@ -161,10 +172,10 @@ def main():
 
     # Step 4: Feature extraction stage (ResNet)
     """
-    
-    Extracts features from both preprocessed and augmented images 
-    located in /data/train_set/preprocessed/ and /data/train_set/preprocessed/augmented
-    Saves the extracted features in /data/train_set/features.
+    Extracts features from both preprocessed and augmented images of the train set. 
+    These images are located in 
+    data/raw_nii/train_set/preprocessed and data/raw_nii/train_set/preprocessed/augmented
+    Saves the extracted features in data/raw_nii/train_set/extracted_features.
     """
     feature_extraction_pipeline(train_set_dir=TRAIN_SET_DIR,
                                 test_set_dir=TEST_SET_DIR,
@@ -178,10 +189,12 @@ def main():
 
     # Step 5: Model training and validation (SVC)
     """
-    Trains a machine learning model using the extracted features located in /data/train_set/features,
-    Validates the trained model using the test set located in /data/test_set/preprocessed,
-    Saves the trained model in /models.
-    Saves the validation results in /results.
+    Trains a classifier using the extracted features located in 
+    data/raw_nii/train_set/extracted_features,
+    Validates the trained classifier using the images of the test set located in 
+    data/raw_nii/test_set/preprocessed,
+    Saves the trained model in src/models.
+    Saves the validation results in src/models/results.
     """
     train_and_evaluate(extracted_features_dir=EXTRACTED_FEATURES_DIR,
                        dir_to_save_clf=SAVE_CLF_DIR,

@@ -1,7 +1,10 @@
-file_paths:
-  clinical_data_dir: "data/clinical_data.csv"
+base:
   raw_pt_data_dir: "data/raw_pt"
   raw_nii_data_dir: "data/raw_nii"
+
+eda:
+  clinical_data_dir: "data/clinical_data.csv"
+  is_perform_eda: True
 
 dataset_preparation:
   train_set_dir: "train_set"

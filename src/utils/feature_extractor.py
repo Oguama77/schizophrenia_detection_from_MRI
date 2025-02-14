@@ -7,8 +7,6 @@ from torch.utils.data import DataLoader
 from src.utils.data_loader import MRIDataset
 from src.models.cnn import FeatureExtractor
 
-# TODO: ADD CORRECT TRAIN_SET_DIR, TEST_SET_DIR, LABELS_FILE, FEATURE_EXTRACTOR_MODEL, BATCH_SIZE, FEATURES_DIR
-
 
 # Collate function for DataLoader (handles empty batches)
 def collate_fn(batch):
