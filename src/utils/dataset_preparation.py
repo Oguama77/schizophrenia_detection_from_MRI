@@ -5,7 +5,7 @@ import torch
 from src.utils.preprocess import load_nii, resample_image, normalize_data
 
 
-def prepare_dataset(train_ratio: float = 0.8,
+def prepare_dataset(train_ratio: float = 0.76,
                     raw_pt_dir: str = "data/raw_pt",
                     raw_nii_dir: str = "data/raw_nii",
                     train_set_output_dir: str = "train_set",

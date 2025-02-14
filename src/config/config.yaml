@@ -1,34 +1,57 @@
 file_paths:
-  raw_data_dir: ${hydra:runtime.cwd}"data/raw"
-  preprocessed_dir: "data/processed"
-  augmented_dir: "data/fully_processed"
-  train_set_dir: "data/train_set"
+  clinical_data_dir: "data/clinical_data.csv"
+  raw_pt_data_dir: "data/raw_pt"
+  raw_nii_data_dir: "data/raw_nii"
 
-resnet_params:
-  base_model_name: 'resnet18'
-  weights: models.ResNet18_Weights.IMAGENET1K_V1
-  input_channels: 1
-  
-svc_params:
-  kernel: 'rbf'
-  C: 100
-  gamma: 0.0001
-  random_state: 42
+dataset_preparation:
+  train_set_dir: "train_set"
+  test_set_dir: "test_set"
+  train_set_ratio: 0.76
+  is_normalize_when_preparing: True
+  normalization_method: "min-max"
 
 preprocessing_params:
+  preprocessed_data_dir: "preprocessed"
+  is_normalize_when_preprocess: False
+  is_brain_exaction: True
+  is_crop: False
+  is_smooth: True
+  is_re_normalize_after_smooth: False
+  is_preprocess_test_set: False
   target_shape: (192, 256, 256)
-  voxel_size: tuple=(2, 2, 2)
-  order: int = 4
-  mode: str='reflect'
-  cval: float=0.0
-  output_format: str='numpy'
+  voxel_size: (2, 2, 2)
   min_val: 0
   max_val: 1
-  eps: float = 1e-8
   modality: 't1'
-  verbose: bool = True
+  verbose: True
   sigma: 1.5
   order: 2
   mode: 'constant'
   cval: 1.0, 
-  truncate: 2.0
+  truncate: 2.0 
+  order: int = 4
+  
+augmentation_params:
+  augmented_data_dir: "augmented"
+  how_many_augmentations: 4
+  translation_shift: 5
+  rotation_angle: 10
+  gaussian_noise_mean: 0
+  gaussian_noise_std: 0.1
+
+resnet_params:
+  base_model_name: 'resnet18'
+  base_model_weights: models.ResNet18_Weights.IMAGENET1K_V1
+  input_channels: 1
+
+feature_extraction_params:
+  labels_dir: ""
+  extracted_features_dir: "extracted_features"
+  batch_size: 64  
+  
+svc_params:
+  save_clf_dir: ""
+  results_output_dir: ""
+  kernel: 'rbf'
+  C: 100
+  gamma: 0.0001

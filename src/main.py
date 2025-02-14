@@ -1,3 +1,4 @@
+import os
 from logger import logger
 from omegaconf import OmegaConf
 from utils.eda import SchizophreniaEDA
@@ -6,45 +7,39 @@ from utils.preprocessing import preprocess_images
 from utils.augment_images import augment_images
 from utils.feature_extractor import feature_extraction_pipeline
 from utils.classifier import train_and_evaluate
+from utils.plot_svm_metrics import SVMVisualizer
 
 
 def main():
     logger.info("The program started...")
 
     # Load configuration from a config file
-    config_data = OmegaConf.load('config.yaml')
+    config_data = OmegaConf.load('config/config.yaml')
 
-    # Accessing parameters # TODO: USE CAPITALS FOR CONSTANTS
+    # Accessing parameters
     CLINICAL_DATA_DIR = config_data.file_paths.clinical_data_dir
     RAW_PT_DATA_DIR = config_data.file_paths.raw_pt_data_dir
     RAW_NII_DATA_DIR = config_data.file_paths.raw_nii_data_dir
-    PREPROCESSED_DATA_DIR = config_data.file_paths.preprocessed_dir
-    AUGMENTED_DATA_DIR = config_data.file_paths.augmented_dir
-    TRAIN_SET_DIR = config_data.file_paths.train_set_dir
-    TEST_SET_DIR = config_data.file_paths.test_set_dir
 
-    PREPROCESSING_STEPS = config_data.dataset_preparation.preprocessing_steps  # ["resample", "normalize", "extract_brain"]
-    AUGMENTATION_STEPS = config_data.dataset_preparation.augmentation_steps  # "translation"  # Options: 'translation', 'rotation', 'gaussian_noise'
-    HOW_MANY_AUGMENTATIONS = config_data.dataset_preparation.how_many_augmentations  # 4
+    #PREPROCESSING_STEPS = config_data.dataset_preparation.preprocessing_steps  # ["resample", "normalize", "extract_brain"]
+    #AUGMENTATION_STEPS = config_data.dataset_preparation.augmentation_steps  # "translation"  # Options: 'translation', 'rotation', 'gaussian_noise'
+    TRAIN_SET_DIR = config_data.dataset_preparation.train_set_dir
+    TEST_SET_DIR = config_data.dataset_preparation.test_set_dir
     TRAIN_SET_RATIO = config_data.dataset_preparation.train_set_ratio  # 0.24: 50 - train, 12 - test
-    IS_NORMALIZE_DEFAULT = config_data.dataset_preparation.normalize_default  # True False
+    IS_NORMALIZE_WHEN_PREPARING = config_data.dataset_preparation.is_normalize_when_preparing  # True False
     NORMALIZATION_METHOD = config_data.dataset_preparation.normalization_method  # min-max
 
-    IS_NORMALIZE_WHEN_PREPROCESS = config_data.preprocessing_params.normalize_when_preprocess
-    IS_BRAIN_EXTRACTION = config_data.preprocessing_params.do_brain_exaction
-    IS_CROP = config_data.preprocessing_params.do_crop
-    IS_SMOOTH = config_data.preprocessing_params.do_smooth
-    IS_RE_NORMALIZE_AFTER_SMOOTH = config_data.preprocessing_params.do_re_normalize_after_smooth
-    IS_PREPROCESS_TEST_SET = config_data.preprocessing_params.preprocess_test_set
+    PREPROCESSED_DATA_DIR = config_data.preprocessing_params.preprocessed_data_dir
+    IS_NORMALIZE_WHEN_PREPROCESS = config_data.preprocessing_params.is_normalize_when_preprocess
+    IS_BRAIN_EXTRACTION = config_data.preprocessing_params.is_brain_exaction
+    IS_CROP = config_data.preprocessing_params.is_crop
+    IS_SMOOTH = config_data.preprocessing_params.is_smooth
+    IS_RE_NORMALIZE_AFTER_SMOOTH = config_data.preprocessing_params.is_re_normalize_after_smooth
+    IS_PREPROCESS_TEST_SET = config_data.preprocessing_params.is_preprocess_test_set
 
-    TARGET_SHAPE = config_data.preprocessing_params.target_shape
     VOXEL_SIZE = config_data.preprocessing_params.voxel_size
-    #ORDER = config_data.preprocessing_params.order
-    #MODE = config_data.preprocessing_params.mode
-    #CVAL = config_data.preprocessing_params.cval
     MIN_VAL = config_data.preprocessing_params.min_val
     MAX_VAL = config_data.preprocessing_params.max_val
-    #EPS = config_data.preprocessing_params.eps
     MODALITY = config_data.preprocessing_params.modality
     VERBOSE = config_data.preprocessing_params.verbose
     SIGMA = config_data.preprocessing_params.sigma
@@ -53,6 +48,8 @@ def main():
     CVAL = config_data.preprocessing_params.cval
     TRUNCATE = config_data.preprocessing_params.truncate
 
+    AUGMENTED_DATA_DIR = config_data.augmentation_params.augmented_data_dir
+    HOW_MANY_AUGMENTATIONS = config_data.augmentation_params.how_many_augmentations  # 4
     TRANSLATION_SHIFT = config_data.augmentation_params.translation_shift
     ROTATION_ANGLE = config_data.augmentation_params.rotation_angle
     GAUSSIAN_NOISE_MEAN = config_data.augmentation_params.gaussian_noise_mean
@@ -71,7 +68,7 @@ def main():
     KERNEL = config_data.svc_params.kernel
     C = config_data.svc_params.C
     GAMMA = config_data.svc_params.gamma
-    #RANDOM_STATE = config_data.svc_params.random_state
+
 
     # Step 0: Explanatory data analysis
     """
@@ -79,7 +76,9 @@ def main():
     This step is optional and can be skipped if not necessary.
     """
     eda = SchizophreniaEDA(CLINICAL_DATA_DIR, RAW_PT_DATA_DIR)
-    eda.perform_eda(CLINICAL_DATA_DIR)
+    eda.plot_age_distribution()
+    eda.plot_gender_distribution()
+    eda.get_age_statistics()
     eda.save_raw_images_metrics()
     logger.info("EDA completed.")
 
@@ -98,7 +97,7 @@ def main():
                     train_set_output_dir=TRAIN_SET_DIR,
                     test_set_output_dir=TEST_SET_DIR,
                     resampling_voxel_size=VOXEL_SIZE,
-                    normalize=IS_NORMALIZE_DEFAULT,
+                    normalize=IS_NORMALIZE_WHEN_PREPARING,
                     norm_method=NORMALIZATION_METHOD,
                     min_max_min_val=MIN_VAL,
                     min_max_max_val=MAX_VAL)
@@ -151,7 +150,7 @@ def main():
             }),
             ("gaussian_noise", {
                 "mean": GAUSSIAN_NOISE_MEAN,
-                "std": GAUSSIAN_NOISE_STD
+                "std": GAUSSIAN_NOISE_STD # 0.1
             }),
         ],
         num_augmentations=HOW_MANY_AUGMENTATIONS,
@@ -197,9 +196,13 @@ def main():
     """
     Plots model metrics (accuracy, precision, recall, f1-score) on the test set.
     """
+    path_to_results = os.path.join(EXTRACTED_FEATURES_DIR, RESULTS_OUTPUT_DIR, ".json")
+    svm_visualizer = SVMVisualizer(results_json_path=path_to_results)
+    svm_visualizer.plot_confusion_matrix()
+    svm_visualizer.plot_roc_curve()
+    logger.info("Classifier metrics have been plotted.")
 
     logger.info("The program completed successfully.")
-
 
 if __name__ == "__main__":
     main()
