@@ -65,21 +65,24 @@ def feature_extraction_pipeline(train_set_dir,
                              collate_fn=collate_fn)
 
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    model = FeatureExtractor(
-        base_model_name=feature_extractor_model,
-        weights=weights,
-        input_channels=input_channels).to(device)
+    model = FeatureExtractor(base_model_name=feature_extractor_model,
+                             weights=weights,
+                             input_channels=input_channels).to(device)
 
     # Extract features
     print("Extracting training features...")
     train_features, train_labels = extract_features(train_loader, model,
                                                     device)
-    np.save(os.path.join(extracted_features_dir, "train_features.npy"), train_features)
-    np.save(os.path.join(extracted_features_dir, "train_labels.npy"), train_labels)
+    np.save(os.path.join(extracted_features_dir, "train_features.npy"),
+            train_features)
+    np.save(os.path.join(extracted_features_dir, "train_labels.npy"),
+            train_labels)
 
     print("Extracting test features...")
     test_features, test_labels = extract_features(test_loader, model, device)
-    np.save(os.path.join(extracted_features_dir, "test_features.npy"), test_features)
-    np.save(os.path.join(extracted_features_dir, "test_labels.npy"), test_labels)
+    np.save(os.path.join(extracted_features_dir, "test_features.npy"),
+            test_features)
+    np.save(os.path.join(extracted_features_dir, "test_labels.npy"),
+            test_labels)
 
     print("Feature extraction completed.")
