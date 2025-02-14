@@ -33,12 +33,12 @@ def load_features(
     return train_features, train_labels, test_features, test_labels
 
 
-def train_and_evaluate(extracted_features_dir: str,
-                       dir_to_save_clf: str,
-                       results_output_dir: str,
-                       clf_kernel,
-                       clf_c_value,
-                       clf_gamma_value) -> None:
+def train_and_evaluate(extracted_features_dir: str = "data/extracted_features",
+                       dir_to_save_clf: str = "src/models/svm_classifier.pkl",
+                       results_output_dir: str = "src/models/results/classification_results.json",
+                       clf_kernel: str = "rbf",
+                       clf_c_value: int = 100,
+                       clf_gamma_value: float = 0.0001) -> None:
     """
     Trains an SVM classifier on extracted features and evaluates it on a test set.
 
@@ -85,8 +85,7 @@ def train_and_evaluate(extracted_features_dir: str,
         "test_scores": test_scores.tolist()  # For ROC AUC visualization
     }
 
-    results_path = os.path.join(extracted_features_dir, results_output_dir+'.json') # "classification_results.json"
-    with open(results_path, "w") as f:
+    with open(results_output_dir, "w") as f:
         json.dump(results, f, indent=4)
 
-    logger.info(f"Classification results saved to {results_path}")
+    logger.info(f"Classification results saved to {results_output_dir}")

@@ -3,6 +3,9 @@ import torch
 from src.utils.preprocess import normalize_data, extract_brain, crop_to_largest_bounding_box, apply_gaussian_smoothing
 
 def preprocess_images(
+        raw_nii_dir: str = "data/raw_nii",
+        train_set_dir: str = "train_set",
+        test_set_dir: str = "test_set",
         normalize: bool = False,
         norm_method: str = "min-max",
         min_max_min_val: float = 0,
@@ -23,9 +26,9 @@ def preprocess_images(
         ) -> None:
     """
     """
-    for dataset in ["train_set", "test_set"] if preprocess_test_set else ["train_set"]:
-        input_dir = f"data/raw_nii/{dataset}"
-        output_dir = output_dir #f"{input_dir}/preprocessed"
+    for dataset in [train_set_dir, test_set_dir] if preprocess_test_set else [train_set_dir]:
+        input_dir = raw_nii_dir + '/' + dataset #f"data/raw_nii/{dataset}"
+        output_dir = input_dir + '/' + output_dir #f"{input_dir}/preprocessed"
         os.makedirs(output_dir, exist_ok=True)
         
         for img in os.listdir(input_dir):

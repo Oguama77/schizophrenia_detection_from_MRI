@@ -4,10 +4,12 @@ import random
 from src.utils.augmentations import apply_translation, apply_rotation, apply_gaussian_noise
 
 def augment_images(
-        augmentations,
-        num_augmentations,
-        input_dir="data/raw_nii/train_set/preprocessed",
-        output_dir="data/raw_nii/train_set/preprocessed/augmented") -> None:
+        augmentations: list[tuple],
+        num_augmentations: int = 3,
+        raw_nii_dir: str = "data/raw_nii",
+        train_set_dir: str = "train_set",
+        preprocessed_train_set_dir: str = "preprocessed",
+        output_dir="augmented") -> None:
     """
     Applies user-specified augmentations to images in input_dir and saves them to output_dir.
 
@@ -21,7 +23,8 @@ def augment_images(
     Returns:
         None
     """
-
+    input_dir = os.path.join(raw_nii_dir, train_set_dir, preprocessed_train_set_dir)
+    output_dir = os.path.join(input_dir, output_dir)
     os.makedirs(output_dir, exist_ok=True)
 
     # Get images from folder and load them

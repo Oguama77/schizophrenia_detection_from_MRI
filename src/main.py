@@ -61,8 +61,9 @@ def main():
     BASE_MODEL_WEIGHTS = config_data.resnet_params.base_model_weights
     INPUT_CHANNELS = config_data.resnet_params.input_channels
 
-    LABELS_DIR = config_data.feature_extraction_params.labels_dir
+    LABELS_DIR = config_data.eda.clinical_data_dir
     EXTRACTED_FEATURES_DIR = config_data.feature_extraction_params.extracted_features_dir
+    TARGET_SHAPE = config_data.feature_extraction_params.target_shape
     BATCH_SIZE = config_data.feature_extraction_params.batch_size
 
     SAVE_CLF_DIR = config_data.svc_params.save_clf_dir
@@ -125,7 +126,10 @@ def main():
     may also be resampled and normalized for consistency (user-defined option),
     Saves preprocessed test images in data/raw_nii/test_set/preprocessed.
     """
-    preprocess_images(normalize=IS_NORMALIZE_WHEN_PREPROCESS,
+    preprocess_images(raw_nii_dir=RAW_NII_DATA_DIR,
+                      train_set_dir=TRAIN_SET_DIR,
+                      test_set_dir=TEST_SET_DIR,
+                      normalize=IS_NORMALIZE_WHEN_PREPROCESS,
                       norm_metod=NORMALIZATION_METHOD,
                       min_max_min_val=MIN_VAL,
                       min_max_max_val=MAX_VAL,
@@ -165,8 +169,10 @@ def main():
             }),
         ],
         num_augmentations=HOW_MANY_AUGMENTATIONS,
-        input_dir=PREPROCESSED_DATA_DIR,
-        output_dir=AUGMENTED_DATA_DIR,
+        raw_nii_dir=RAW_NII_DATA_DIR,
+        train_set_dir=TRAIN_SET_DIR,
+        preprocessed_train_set_dir=PREPROCESSED_DATA_DIR,
+        output_dir=AUGMENTED_DATA_DIR
     )
     logger.info("Augmentation completed.")
 
@@ -177,10 +183,14 @@ def main():
     data/raw_nii/train_set/preprocessed and data/raw_nii/train_set/preprocessed/augmented
     Saves the extracted features in data/raw_nii/train_set/extracted_features.
     """
-    feature_extraction_pipeline(train_set_dir=TRAIN_SET_DIR,
+    feature_extraction_pipeline(raw_nii_dir=RAW_NII_DATA_DIR,
+                                train_set_dir=TRAIN_SET_DIR,
                                 test_set_dir=TEST_SET_DIR,
+                                preprocessed_set_dir=PREPROCESSED_DATA_DIR,
+                                augmented_train_set_dir=AUGMENTED_DATA_DIR,
                                 labels_dir=LABELS_DIR,
                                 extracted_features_dir=EXTRACTED_FEATURES_DIR,
+                                target_shape=TARGET_SHAPE,
                                 batch_size=BATCH_SIZE,
                                 feature_extraction_model=BASE_MODEL_NAME,
                                 base_model_weights=BASE_MODEL_WEIGHTS,
@@ -208,9 +218,9 @@ def main():
     # Step 6: Plot model (SVC) metrics
     """
     Plots model metrics (accuracy, precision, recall, f1-score) on the test set.
+    The results are loaded from src/models/results.
     """
-    path_to_results = os.path.join(EXTRACTED_FEATURES_DIR, RESULTS_OUTPUT_DIR, ".json")
-    svm_visualizer = SVMVisualizer(results_json_path=path_to_results)
+    svm_visualizer = SVMVisualizer(results_json_path=RESULTS_OUTPUT_DIR)
     svm_visualizer.plot_confusion_matrix()
     svm_visualizer.plot_roc_curve()
     logger.info("Classifier metrics have been plotted.")

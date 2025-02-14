@@ -36,7 +36,7 @@ preprocessing_params:
   
 augmentation_params:
   augmented_data_dir: "augmented"
-  how_many_augmentations: 4
+  how_many_augmentations: 3
   translation_shift: 5
   rotation_angle: 10
   gaussian_noise_mean: 0
@@ -48,13 +48,13 @@ resnet_params:
   input_channels: 1
 
 feature_extraction_params:
-  labels_dir: ""
-  extracted_features_dir: "extracted_features"
-  batch_size: 64  
+  extracted_features_dir: "data/extracted_features"
+  target_shape: (224, 224)
+  batch_size: 64
   
 svc_params:
-  save_clf_dir: ""
-  results_output_dir: ""
+  save_clf_dir: "src/models/svm_classifier.pkl"
+  results_output_dir: "src/models/results/classification_results.json"
   kernel: 'rbf'
   C: 100
   gamma: 0.0001
