@@ -1,4 +1,3 @@
-import os
 from logger import logger
 from omegaconf import OmegaConf
 from utils.eda import SchizophreniaEDA

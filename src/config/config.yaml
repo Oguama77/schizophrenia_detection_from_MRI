@@ -21,8 +21,7 @@ preprocessing_params:
   is_smooth: True
   is_re_normalize_after_smooth: False
   is_preprocess_test_set: False
-  target_shape: (192, 256, 256)
-  voxel_size: (2, 2, 2)
+  voxel_size: [2, 2, 2]
   min_val: 0
   max_val: 1
   modality: 't1'
@@ -30,9 +29,8 @@ preprocessing_params:
   sigma: 1.5
   order: 2
   mode: 'constant'
-  cval: 1.0, 
+  cval: 1.0
   truncate: 2.0 
-  order: int = 4
   
 augmentation_params:
   augmented_data_dir: "augmented"
@@ -49,7 +47,7 @@ resnet_params:
 
 feature_extraction_params:
   extracted_features_dir: "data/extracted_features"
-  target_shape: (224, 224)
+  target_shape: [224, 224]
   batch_size: 64
   
 svc_params:
