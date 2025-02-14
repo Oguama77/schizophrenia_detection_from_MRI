@@ -16,8 +16,11 @@ Example of the raw data:
 [Data Exploration](src/utils/data_visualization.py) >> [Preprocessing](src/utils/preprocess.py) & [Augmentation](src/utils/augmentation.py) >> [Feature Extraction & Training](src/models/models.py) >> [Visualizing training results](src/utils/model_plotter.py)
 
 &check; Data Exploration: assessed demographic features and gender/age distributions;
+
 &check; Preprocessing & Augmentation: experimented with different combinations of preprocessing and data augmentation techniques to determine which pipeline yields the best performance of the ML/DL models;
+
 &check; Feature Extraction & Training: harnessed ResNet-18 to extract features and SVC to classify them;
+
 &check; Visualizing: obtained accuracy metrics of the classifier.
 
 #### Definitions and specifications

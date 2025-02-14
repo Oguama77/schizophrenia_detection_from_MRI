@@ -3,7 +3,6 @@ import torch
 import random
 from src.utils.augmentations import apply_translation, apply_rotation, apply_gaussian_noise
 
-
 def augment_images(
         augmentations,
         num_augmentations,
@@ -11,14 +10,14 @@ def augment_images(
         output_dir="data/raw_nii/train_set/preprocessed/augmented") -> None:
     """
     Applies user-specified augmentations to images in input_dir and saves them to output_dir.
-    
+
     Parameters:
     - augmentations (list of tuples): List of augmentations to apply. Each tuple should be (augmentation_type, params).
-      Example: [("translation", {"shift": (5, 5)}), ("rotation", {"angle": 15})]
+      Example: [("translation", {"shift": (-5, 5)}), ("rotation", {"angle": (-10, 10)})]
     - num_augmentations (int): Number of times to apply the augmentation sequence per image.
     - input_dir (str): Path to the input directory containing .pt images (images converted to Pytorch tensors).
     - output_dir (str): Path to save augmented images.
-    
+
     Returns:
         None
     """
@@ -31,31 +30,29 @@ def augment_images(
             file_path = os.path.join(input_dir, file)
             image_data = torch.load(file_path).numpy()
 
-            # make a copy of the data for each combination of augmentation steps
+            # Make a copy of the data for each augmentation pass
             for i in range(num_augmentations):
                 augmented_data = image_data.copy()
+                augmentation_description = []
 
                 # Apply each augmentation in sequence
-                augmentation_description = []
                 for aug_type, params in augmentations:
                     if aug_type == "translation":
-                        shift_x = params.get("shift_x",
-                                             random.randint(-10, 10))
-                        shift_y = params.get("shift_y",
-                                             random.randint(-10, 10))
+                        shift_x = random.uniform(*params["shift"])
+                        shift_y = random.uniform(*params["shift"])
                         augmented_data = apply_translation(
                             augmented_data, (shift_x, shift_y))
                         augmentation_description.append(
-                            f"trans_{shift_x}_{shift_y}")
+                            f"trans_{shift_x:.1f}_{shift_y:.1f}")
 
                     elif aug_type == "rotation":
-                        angle = params.get("angle", random.uniform(-10, 10))
+                        angle = random.uniform(*params["angle"])
                         augmented_data = apply_rotation(augmented_data, angle)
                         augmentation_description.append(f"rot_{angle:.1f}")
 
                     elif aug_type == "gaussian_noise":
                         mean = params.get("mean", 0)
-                        std = params.get("std", 0.1)
+                        std = params["std"]
                         augmented_data = apply_gaussian_noise(
                             augmented_data, mean, std)
                         augmentation_description.append(f"noise_{std:.2f}")

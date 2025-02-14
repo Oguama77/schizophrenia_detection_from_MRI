@@ -41,36 +41,45 @@ def extract_features(loader, model, device):
 
 
 # Main feature extraction pipeline
-def feature_extraction_pipeline():
-    os.makedirs(FEATURES_DIR, exist_ok=True)
+def feature_extraction_pipeline(train_set_dir,
+                                test_set_dir,
+                                labels_dir,
+                                extracted_features_dir,
+                                batch_size,
+                                feature_extractor_model,
+                                weights,
+                                input_channels: int = 1) -> None:
+    os.makedirs(extracted_features_dir, exist_ok=True)
 
     print("Loading datasets...")
-    train_dataset = MRIDataset(TRAIN_SET_DIR, LABELS_FILE)
-    test_dataset = MRIDataset(TEST_SET_DIR, LABELS_FILE)
+    train_dataset = MRIDataset(train_set_dir, labels_dir)
+    test_dataset = MRIDataset(test_set_dir, labels_dir)
 
     train_loader = DataLoader(train_dataset,
-                              batch_size=BATCH_SIZE,
+                              batch_size=batch_size,
                               shuffle=True,
                               collate_fn=collate_fn)
     test_loader = DataLoader(test_dataset,
-                             batch_size=BATCH_SIZE,
+                             batch_size=batch_size,
                              shuffle=False,
                              collate_fn=collate_fn)
 
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     model = FeatureExtractor(
-        base_model_name=FEATURE_EXTRACTOR_MODEL).to(device)
+        base_model_name=feature_extractor_model,
+        weights=weights,
+        input_channels=input_channels).to(device)
 
     # Extract features
     print("Extracting training features...")
     train_features, train_labels = extract_features(train_loader, model,
                                                     device)
-    np.save(os.path.join(FEATURES_DIR, "train_features.npy"), train_features)
-    np.save(os.path.join(FEATURES_DIR, "train_labels.npy"), train_labels)
+    np.save(os.path.join(extracted_features_dir, "train_features.npy"), train_features)
+    np.save(os.path.join(extracted_features_dir, "train_labels.npy"), train_labels)
 
     print("Extracting test features...")
     test_features, test_labels = extract_features(test_loader, model, device)
-    np.save(os.path.join(FEATURES_DIR, "test_features.npy"), test_features)
-    np.save(os.path.join(FEATURES_DIR, "test_labels.npy"), test_labels)
+    np.save(os.path.join(extracted_features_dir, "test_features.npy"), test_features)
+    np.save(os.path.join(extracted_features_dir, "test_labels.npy"), test_labels)
 
     print("Feature extraction completed.")

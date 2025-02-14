@@ -2,15 +2,19 @@ import os
 import shutil
 import random
 import torch
-from typing import Optional
 from src.utils.preprocess import load_nii, resample_image, normalize_data
 
 
 def prepare_dataset(train_ratio: float = 0.8,
                     raw_pt_dir: str = "data/raw_pt",
                     raw_nii_dir: str = "data/raw_nii",
+                    train_set_output_dir: str = "train_set",
+                    test_set_output_dir: str = "test_set",
+                    resampling_voxel_size: tuple = (2, 2, 2),
                     normalize: bool = True,
-                    norm_method: str = "min-max") -> None:
+                    norm_method: str = "min-max",
+                    min_max_min_val: float = 0,
+                    min_max_max_val: float = 1) -> None:
     """
     Splits MRI images into training and test sets while maintaining the same split across .pt and .nii formats.
     
@@ -25,12 +29,8 @@ def prepare_dataset(train_ratio: float = 0.8,
         norm_method (str): Normalization method ("min-max" or other supported methods).
     """
     # Define train/test directories
-    train_pt_dir, test_pt_dir = os.path.join(raw_pt_dir,
-                                             "train_set"), os.path.join(
-                                                 raw_pt_dir, "test_set")
-    train_nii_dir, test_nii_dir = os.path.join(raw_nii_dir,
-                                               "train_set"), os.path.join(
-                                                   raw_nii_dir, "test_set")
+    train_pt_dir, test_pt_dir = os.path.join(raw_pt_dir, train_set_output_dir), os.path.join(raw_pt_dir, test_set_output_dir)
+    train_nii_dir, test_nii_dir = os.path.join(raw_nii_dir, train_set_output_dir), os.path.join(raw_nii_dir, test_set_output_dir)
 
     # Create required directories
     for directory in [train_pt_dir, test_pt_dir, train_nii_dir, test_nii_dir]:
@@ -63,10 +63,12 @@ def prepare_dataset(train_ratio: float = 0.8,
                 continue
 
             nii_img = load_nii(nii_path)
-            processed_img = resample_image(nii_img)
+            processed_img = resample_image(nii_img, voxel_size=resampling_voxel_size)
             if normalize:
                 processed_img = normalize_data(processed_img,
-                                               method=norm_method)
+                                               method=norm_method,
+                                               min_val=min_max_min_val,
+                                               max_val=min_max_max_val)
 
             torch.save(torch.tensor(processed_img, dtype=torch.float32),
                        os.path.join(save_dir, img))
