@@ -10,13 +10,13 @@ logging.basicConfig(level=logging.INFO,
                     format="%(asctime)s - %(levelname)s - %(message)s")
 
 # Define paths
-FEATURES_DIR = "path/to/save/features"
-MODEL_PATH = "path/to/save/model.pkl"
+#FEATURES_DIR = "path/to/save/features"
+#MODEL_PATH = "path/to/save/model.pkl"
 
 
 def load_features(
-    features_dir: str = FEATURES_DIR
-) -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
+    features_dir: str
+    ) -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
     """
     Loads extracted features and labels from disk.
 
@@ -30,11 +30,9 @@ def load_features(
         FileNotFoundError: If any of the required feature files are missing.
     """
     try:
-        train_features = np.load(
-            os.path.join(features_dir, "train_features.npy"))
+        train_features = np.load(os.path.join(features_dir, "train_features.npy"))
         train_labels = np.load(os.path.join(features_dir, "train_labels.npy"))
-        test_features = np.load(os.path.join(features_dir,
-                                             "test_features.npy"))
+        test_features = np.load(os.path.join(features_dir, "test_features.npy"))
         test_labels = np.load(os.path.join(features_dir, "test_labels.npy"))
     except FileNotFoundError as e:
         logging.error(f"Feature file not found: {e}")
@@ -43,8 +41,12 @@ def load_features(
     return train_features, train_labels, test_features, test_labels
 
 
-def train_and_evaluate(model_path: str = MODEL_PATH,
-                       features_dir: str = FEATURES_DIR) -> None:
+def train_and_evaluate(extracted_features_dir: str,
+                       dir_to_save_clf: str,
+                       results_output_dir: str,
+                       clf_kernel,
+                       clf_c_value,
+                       clf_gamma_value) -> None:
     """
     Trains an SVM classifier on extracted features and evaluates it on a test set.
 
@@ -56,16 +58,19 @@ def train_and_evaluate(model_path: str = MODEL_PATH,
         None
     """
     logging.info("Loading extracted features...")
-    X_train, y_train, X_test, y_test = load_features(features_dir)
+    X_train, y_train, X_test, y_test = load_features(extracted_features_dir)
 
     # Train SVM classifier
     logging.info("Training SVM classifier...")
-    classifier = SVMClassifier()
+    classifier = SVMClassifier(kernel=clf_kernel,
+                               C=clf_c_value,
+                               gamma=clf_gamma_value,
+                               random_state=42)
     classifier.train(X_train, y_train)
 
     # Save trained model
-    classifier.save_model(model_path)
-    logging.info(f"Model saved to {model_path}")
+    classifier.save_model(dir_to_save_clf)
+    logging.info(f"Model saved to {dir_to_save_clf}")
 
     # Make predictions and get decision function for ROC AUC
     test_preds = classifier.predict(X_test)
@@ -85,7 +90,7 @@ def train_and_evaluate(model_path: str = MODEL_PATH,
         "confusion_matrix": conf_matrix.tolist()
     }
 
-    results_path = os.path.join(features_dir, "classification_results.json")
+    results_path = os.path.join(extracted_features_dir, results_output_dir+'.json') # "classification_results.json"
     with open(results_path, "w") as f:
         json.dump(results, f, indent=4)
 
