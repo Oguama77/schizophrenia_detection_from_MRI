@@ -2,7 +2,7 @@ import os
 import torch
 import random
 from logger import logger
-from src.utils.augmentations import apply_translation, apply_rotation, apply_gaussian_noise
+from utils.augmentations import apply_translation, apply_rotation, apply_gaussian_noise
 
 def augment_images(
         augmentations: list[tuple],

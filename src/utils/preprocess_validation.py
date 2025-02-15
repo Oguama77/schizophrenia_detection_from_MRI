@@ -6,8 +6,7 @@ from logger import logger
 from skimage.filters import threshold_otsu
 from skimage.metrics import mean_squared_error
 from skimage.metrics import structural_similarity as ssim
-
-from src.utils.preprocess import get_data, match_dimensions
+from utils.preprocess import get_data, match_dimensions
 
 
 def plot_slices(data: Union[np.ndarray, nib.Nifti1Image],

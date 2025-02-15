@@ -1,7 +1,7 @@
 import os
 import torch
 from logger import logger
-from src.utils.preprocess import (
+from utils.preprocess import (
     normalize_data,
     extract_brain,
     crop_to_largest_bounding_box,

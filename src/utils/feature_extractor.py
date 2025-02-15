@@ -6,8 +6,8 @@ import pandas as pd
 from logger import logger
 import tqdm
 from torch.utils.data import DataLoader
-from src.utils.data_loader import MRIDataset
-from src.models.cnn import FeatureExtractor
+from utils.data_loader import MRIDataset
+from models.cnn import FeatureExtractor
 
 
 # Function to get image paths

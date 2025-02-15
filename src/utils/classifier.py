@@ -2,7 +2,7 @@ import os
 import json
 import numpy as np
 from logger import logger
-from src.models.svm import SVMClassifier
+from models.svm import SVMClassifier
 from sklearn.metrics import accuracy_score, classification_report, roc_auc_score, confusion_matrix
 
 
