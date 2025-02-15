@@ -10,6 +10,8 @@ version = "1.0"
 dependencies = [
 	"numpy",
     "pandas",
+    "json",
+    "tqdm",
     "scipy",
     "nibabel",
     "scikit-image",
@@ -20,10 +22,6 @@ dependencies = [
     "matplotlib",
     "seaborn",
     "joblib",
-    "pydicom",
-    "imageio",
-    "pyvista",
-    "pyvistaqt",
 ]
 [project.optional-dependencies]
 dev = [

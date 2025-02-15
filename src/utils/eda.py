@@ -1,9 +1,8 @@
 import os
+import torch
 import pandas as pd
 import matplotlib.pyplot as plt
-import torch
 from typing import Optional, Dict, List, Any
-
 from utils.preprocess_validation import calculate_metrics
 
 
@@ -132,7 +131,7 @@ class SchizophreniaEDA:
             try:
                 loaded_tensor = torch.load(file_path)
                 tensor_numpy = loaded_tensor.numpy()
-                raw_metrics = calculate_metrics(file_name, tensor_numpy)
+                raw_metrics = calculate_metrics(None, tensor_numpy)
                 raw_metrics_all_images.append(raw_metrics)
             except Exception as e:
                 print(f"Error processing {file_path}: {e}")

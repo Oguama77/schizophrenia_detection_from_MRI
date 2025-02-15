@@ -1,17 +1,9 @@
 import os
 import json
 import numpy as np
-import logging
-from sklearn.metrics import accuracy_score, classification_report, roc_auc_score, confusion_matrix
+from logger import logger
 from src.models.svm import SVMClassifier
-
-# Configure logging
-logging.basicConfig(level=logging.INFO,
-                    format="%(asctime)s - %(levelname)s - %(message)s")
-
-# Define paths
-#FEATURES_DIR = "path/to/save/features"
-#MODEL_PATH = "path/to/save/model.pkl"
+from sklearn.metrics import accuracy_score, classification_report, roc_auc_score, confusion_matrix
 
 
 def load_features(
@@ -35,18 +27,18 @@ def load_features(
         test_features = np.load(os.path.join(features_dir, "test_features.npy"))
         test_labels = np.load(os.path.join(features_dir, "test_labels.npy"))
     except FileNotFoundError as e:
-        logging.error(f"Feature file not found: {e}")
+        logger.error(f"Feature file not found: {e}")
         raise
 
     return train_features, train_labels, test_features, test_labels
 
 
-def train_and_evaluate(extracted_features_dir: str,
-                       dir_to_save_clf: str,
-                       results_output_dir: str,
-                       clf_kernel,
-                       clf_c_value,
-                       clf_gamma_value) -> None:
+def train_and_evaluate(extracted_features_dir: str = "data/extracted_features",
+                       dir_to_save_clf: str = "src/models/svm_classifier.pkl",
+                       results_output_dir: str = "src/models/results/classification_results.json",
+                       clf_kernel: str = "rbf",
+                       clf_c_value: int = 100,
+                       clf_gamma_value: float = 0.0001) -> None:
     """
     Trains an SVM classifier on extracted features and evaluates it on a test set.
 
@@ -57,11 +49,11 @@ def train_and_evaluate(extracted_features_dir: str,
     Returns:
         None
     """
-    logging.info("Loading extracted features...")
+    logger.info("Loading extracted features...")
     X_train, y_train, X_test, y_test = load_features(extracted_features_dir)
 
     # Train SVM classifier
-    logging.info("Training SVM classifier...")
+    logger.info("Training SVM classifier...")
     classifier = SVMClassifier(kernel=clf_kernel,
                                C=clf_c_value,
                                gamma=clf_gamma_value,
@@ -70,11 +62,11 @@ def train_and_evaluate(extracted_features_dir: str,
 
     # Save trained model
     classifier.save_model(dir_to_save_clf)
-    logging.info(f"Model saved to {dir_to_save_clf}")
+    logger.info(f"Model saved to {dir_to_save_clf}")
 
     # Make predictions and get decision function for ROC AUC
     test_preds = classifier.predict(X_test)
-    test_scores = classifier.decision_function(X_test)
+    test_scores = classifier.predict_proba(X_test)
 
     # Compute evaluation metrics
     acc = accuracy_score(y_test, test_preds)
@@ -87,11 +79,13 @@ def train_and_evaluate(extracted_features_dir: str,
         "accuracy": acc,
         "roc_auc": auc,
         "classification_report": report,
-        "confusion_matrix": conf_matrix.tolist()
+        "confusion_matrix": conf_matrix.tolist(),
+        "y_test": y_test.tolist(),
+        "test_preds": test_preds.tolist(),
+        "test_scores": test_scores.tolist()  # For ROC AUC visualization
     }
 
-    results_path = os.path.join(extracted_features_dir, results_output_dir+'.json') # "classification_results.json"
-    with open(results_path, "w") as f:
+    with open(results_output_dir, "w") as f:
         json.dump(results, f, indent=4)
 
-    logging.info(f"Classification results saved to {results_path}")
+    logger.info(f"Classification results saved to {results_output_dir}")

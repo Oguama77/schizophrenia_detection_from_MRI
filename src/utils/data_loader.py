@@ -26,7 +26,7 @@ class MRIDataset(Dataset):
         self,
         image_paths: List[str],
         labels_file: pd.DataFrame,
-        target_shape: Tuple[int, int] = (128, 128)
+        target_shape: Tuple[int, int] = (224, 224)
     ) -> None:
         """
             Initializes the dataset.
