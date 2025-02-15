@@ -46,6 +46,6 @@ def apply_gaussian_noise(image: np.ndarray, mean: float,
     Returns:
     np.ndarray: The MRI image with added Gaussian noise.
     """
-    std = image.std() * std
-    noise = np.random.normal(mean, std, image.shape).astype(image.dtype)
+    std_g = max(image.std() * std, 1e-6)  # Prevents std from being too small
+    noise = np.random.normal(mean, std_g, image.shape).astype(image.dtype)
     return image + noise

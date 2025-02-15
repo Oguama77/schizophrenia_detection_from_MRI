@@ -3,7 +3,11 @@ import torch
 import pandas as pd
 import tempfile
 from pathlib import Path
-from utils.data_loader import MRIDataset  # Ensure this is correctly imported
+import sys
+import os
+
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
+from src.utils.data_loader import MRIDataset  # Ensure this is correctly imported
 
 class TestMRIDataset(unittest.TestCase):
     def setUp(self):

@@ -1,6 +1,7 @@
 import os
 import torch
 import random
+from logger import logger
 from src.utils.augmentations import apply_translation, apply_rotation, apply_gaussian_noise
 
 def augment_images(
@@ -65,5 +66,5 @@ def augment_images(
                 save_path = os.path.join(output_dir, save_name)
                 torch.save(torch.tensor(augmented_data, dtype=torch.float32),
                            save_path)
-
-                print(f"Saved: {save_path}")
+                
+                logger.info(f"Saved: {save_path}")

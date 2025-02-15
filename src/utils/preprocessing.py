@@ -1,5 +1,6 @@
 import os
 import torch
+from logger import logger
 from src.utils.preprocess import (
     normalize_data,
     extract_brain,
@@ -79,38 +80,42 @@ def preprocess_images(
                     data, method=norm_method, min_val=min_max_min_val, max_val=min_max_max_val
                 )
 
-            # Step 2: Brain Extraction
-            mask_data = None
-            if is_brain_extraction:
-                extracted = extract_brain(
-                    data, 
-                    modality=brain_extraction_modality, 
-                    what_to_return={"extracted_brain": "numpy", "mask": "numpy"},
-                    verbose=brain_extraction_verbose,
-                )
-                data, mask_data = extracted["extracted_brain"], extracted["mask"]
+            # Test set are only resampled and normalized
+            if dataset == train_set_dir:
+                # Step 2: Brain Extraction
+                mask_data = None
+                if is_brain_extraction:
+                    extracted = extract_brain(
+                        data, 
+                        modality=brain_extraction_modality, 
+                        what_to_return={"extracted_brain": "numpy", "mask": "numpy"},
+                        verbose=brain_extraction_verbose,
+                    )
+                    data, mask_data = extracted["extracted_brain"], extracted["mask"]
 
-            # Step 3: Cropping (Uses mask if available, else whole image)
-            if is_crop:
-                if mask_data is not None:
-                    data = crop_to_largest_bounding_box(data=data, mask=mask_data)
-                else:
-                    print(f"Warning: Cropping enabled but no mask found for {img_name}. Skipping crop.")
+                # Step 3: Cropping (Uses mask if available, else whole image)
+                if is_crop:
+                    if mask_data is not None:
+                        data = crop_to_largest_bounding_box(data=data, mask=mask_data)
+                    else:
+                        logger.warning(f"Warning: Cropping enabled but no mask found for {img_name}. Skipping crop.")
 
-            # Step 4: Gaussian Smoothing
-            if is_smooth:
-                data = apply_gaussian_smoothing(
-                    data,
-                    sigma=smooth_sigma,
-                    order=smooth_order,
-                    mode=smooth_mode,
-                    cval=smooth_cval,
-                    truncate=smooth_truncate,
-                )
+                # Step 4: Gaussian Smoothing
+                if is_smooth:
+                    data = apply_gaussian_smoothing(
+                        data,
+                        sigma=smooth_sigma,
+                        order=smooth_order,
+                        mode=smooth_mode,
+                        cval=smooth_cval,
+                        truncate=smooth_truncate,
+                    )
 
-                # Optional: Re-normalize after smoothing
-                if is_re_normalize_after_smooth:
-                    data = normalize_data(data, method=norm_method, min_val=min_max_min_val, max_val=min_max_max_val)
+                    # Optional: Re-normalize after smoothing
+                    if is_re_normalize_after_smooth:
+                        data = normalize_data(data, method=norm_method, min_val=min_max_min_val, max_val=min_max_max_val)
+            else:
+                pass
 
             # Save the processed image
             torch.save(torch.tensor(data), os.path.join(save_dir, img_name))

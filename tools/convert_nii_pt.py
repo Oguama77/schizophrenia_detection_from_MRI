@@ -1,7 +1,8 @@
 import os
 import torch
 import nibabel as nib
-from utils.def_preprocess import resample_image
+from logger import logger
+from utils.preprocess import resample_image
 
 # Paths
 input_dir = 'data'
@@ -18,7 +19,7 @@ def process_and_save(file_path, output_path):
     resampled = resample_image(nii, voxel_size=voxel_size, order=order, mode='reflect', cval=0)  # Resample
     tensor = torch.tensor(resampled, dtype=torch.float32)  # Convert to PyTorch tensor
     torch.save(tensor, output_path)  # Save
-    print(f"Saved: {output_path}")
+    logger.info(f"Saved: {output_path}")
 
 # Process all .nii.gz files
 counter = 0
@@ -28,6 +29,6 @@ for file in os.listdir(input_dir):
         output_path = os.path.join(output_dir, f"{os.path.splitext(file)[0]}.pt")
         process_and_save(file_path, output_path)
         counter += 1
-        print(f'Processed and saved {counter} files.')
+        logger.info(f'Processed and saved {counter} files.')
 
-print("Processing complete!")
+logger.info("Processing complete!")
