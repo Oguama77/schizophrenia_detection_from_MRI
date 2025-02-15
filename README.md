@@ -13,7 +13,7 @@ Example of the raw data:
 </p>
 
 ### Project Workflow
-[Data Exploration](src/utils/data_visualization.py) >> [Preprocessing](src/utils/preprocess.py) & [Augmentation](src/utils/augmentation.py) >> [Feature Extraction & Training](src/models/models.py) >> [Visualizing training results](src/utils/model_plotter.py)
+[Data Loading](src/utils/data_loader.py) >> [Data Exploration](src/utils/eda.py) >> [Preprocessing](src/utils/preprocess.py) >> [Validating Preprocessing Output](src/utils/preprocess_validation.py) >> [Augmentation](src/utils/augmentations.py) >> [Feature Extraction](src/models/cnn.py) & [Training](src/models/svm.py) >> [Visualizing training results](src/utils/plot_svm_metrics.py)
 
 &check; Data Exploration: assessed demographic features and gender/age distributions;
 
@@ -21,7 +21,7 @@ Example of the raw data:
 
 &check; Feature Extraction & Training: harnessed ResNet-18 to extract features and SVC to classify them;
 
-&check; Visualizing: obtained accuracy metrics of the classifier.
+&check; Visualization: obtained classifier metrics and compared results across experiments.
 
 #### Definitions and specifications
 
@@ -30,52 +30,73 @@ Parameters
 ### Repository Structure
 ```.
 |   .gitignore
-|   pyproject.toml
-|   README.md
-|   schizo.code-workspace
-|   selected_files.csv
-|   tox.ini
+|   pyproject.toml              -> Build requirements and deppendencies 
+|   README.md                   -> Project description and file structure
+|   schizo.code-workspace       -> Workspace settings
+|   tox.ini                     -> Test automation
 |
 +---src
-|   |   logger.py
-|   |   main.py
+|   |   logger.py               -> Track errors and debugging information
+|   |   main.py                 -> Main project logic and entrypoint
 |   |   __init__.py
 |   |
 |   +---models
-|   |       models.py
+|   |       cnn.py              -> Architecture for feature extraction
+|   |       svm.py              -> Support vector classifier
 |   |       __init__.py
 |   |
 |   +---paper
-|   |   |   paper.bbl
-|   |   |   paper.bib
-|   |   |   paper.pdf
-|   |   |   paper.tex
-|   |   |   preamble.tex
+|   |   |   paper.bib           -> Formatting report citations
+|   |   |   paper.pdf           -> Actual report in PDF format
+|   |   |   paper.tex           -> LaTeX source document for report
+|   |   |   preamble.tex        -> LaTeX source document for report
+|   |   |   supplementary_figures.pdf -> Visualizations of EDA and training results
 |   |   |
 |   |   \---figs
-|   |           empty.pdf
-|   |           model_architecture.png
+|   |           brain_extraction_image.png  -> MRI slice after brain extraction
+|   |           eval_final_model.png        -> Visualization of final training results
+|   |           metrics_comparison.png      -> Plot of metrics comparison across all experiments
+|   |           model_architecture.png      -> Project workflow and model architecture
+|   |           raw_image.png               -> Unprocessed MRI slice
+|   |           sample_volume.png           -> Plot of 3D MRI volume in 2D
+|   |           slice_comparison.png        -> MRI slice comparison before and after preprocessing
 |   |
 |   \---utils
-|       |   augmentation.py
-|       |   data_loader.py
-|       |   data_visualization.py
-|       |   model_plotter.py
-|       |   preprocess.py
-|       |   preprocess_validation.py
+|       |   augment_images.py       -> Main script for performing specified augmentations
+|       |   augmentations.py        -> Functions for data augmentation
+|       |   classifier.py           -> Main image classification script
+|       |   data_loader.py          -> Data loading
+|       |   dataset_preparation.py  -> Split raw data into training and test sets to prevent data leakage
+|       |   eda.py                  -> Exploratory data analysis on clinical data
+|       |   feature_extractor.py    -> Feature extraction with ResNet18
+|       |   plot_svm_metrics.py     -> Plot confusion matrices and ROC curves for SVC and compare training metrics
+|       |   preprocess_validation.py-> Validate teh output of preprocessing techniques
+|       |   preprocess.py           -> Functions for data preprocessing
+|       |   preprocessing.py        -> Main script for performing specified preprocessing operations
 |       |   __init__.py
 |       |
 |       \---__pycache__
 |               __init__.cpython-312.pyc
 |
 +---tests
-|       test_data_loader.py
-|       test_preprocess.py
+|       test_augmentations.py        -> Test for augmentation pipeline
+|       test_data_loader.py          -> Test for data loading
+|       test_preprocess.py           -> Test for preprocessing pipeline
 |       __init__.py
 |
 \---tools
-        convert_nii_pt.py
+        convert_nii_pt.py             -> Tool to convert images from .nii to .pt
 ```
+
+
+## References
+We did not replicate a specific paper, but information from the following papers were referenced in the final report:  
+1) Gengeç Benli, Ş., & Andaç, M. (2023). Constructing the schizophrenia recognition method employing GLCM features from multiple brain regions and machine learning techniques. Diagnostics, 13(13), 2140.
+2) Harestad, O. A. (2024). Sub-grouping Schizophrenia Spectrum Disorders using Deep Learning on Resting State fMRI (Master's thesis, The University of Bergen).
+3) Joyee, R. F., Rodoshi, L. H., & Nadia, Y. (2023). Application of deep learning in MRI classification of Schizophrenia (Doctoral dissertation, Brac University).
+4) Oh, J., Oh, B. L., Lee, K. U., Chae, J. H., & Yun, K. (2020). Identifying schizophrenia using structural MRI with a deep learning algorithm. Frontiers in psychiatry, 11, 16.
+5) Teskera, T., & Bozek, J. (2023, September). Schizophrenia Detection from Resting State Functional MR Images Using Machine Learning. In 2023 International Symposium ELMAR (pp. 87-90). IEEE.
+
 
 ## Instructions to run the project:
 All command should run under project root/working-directory

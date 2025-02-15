@@ -94,8 +94,7 @@ def main():
         eda.save_raw_images_metrics()
         logger.info("EDA completed.")
     else:
-        logger.info("EDA was skipped.")    
-
+        logger.info("EDA was skipped.")
 
     # Step 1: Select the data (train, test)
     """
@@ -137,26 +136,28 @@ def main():
     Saves preprocessed test images in data/raw_nii/test_set/preprocessed.
     """
     if IS_PERFORM_PREPROCESSING:
-        preprocess_images(raw_nii_dir=RAW_NII_DATA_DIR,
-                          train_set_dir=TRAIN_SET_DIR,
-                          test_set_dir=TEST_SET_DIR,
-                          is_normalize=IS_NORMALIZE_WHEN_PREPROCESS,
-                          norm_metod=NORMALIZATION_METHOD,
-                          min_max_min_val=MIN_VAL,
-                          min_max_max_val=MAX_VAL,
-                          is_brain_extraction=IS_BRAIN_EXTRACTION,
-                          brain_extraction_modality=MODALITY,
-                          brain_extraction_verbose=VERBOSE,
-                          is_crop=IS_CROP,
-                          is_smooth=IS_SMOOTH,
-                          smooth_sigma=SIGMA,
-                          smooth_order=ORDER,
-                          smooth_mode=MODE,
-                          smooth_cval=CVAL,
-                          smooth_truncate=TRUNCATE,
-                          is_re_normalize_after_smooth=IS_RE_NORMALIZE_AFTER_SMOOTH,
-                          is_preprocess_test_set=IS_PREPROCESS_TEST_SET,
-                          output_dir=PREPROCESSED_DATA_DIR)
+        preprocess_images(
+            raw_nii_dir=RAW_NII_DATA_DIR,
+            train_set_dir=TRAIN_SET_DIR,
+            test_set_dir=TEST_SET_DIR,
+            is_normalize=IS_NORMALIZE_WHEN_PREPROCESS,
+            norm_metod=NORMALIZATION_METHOD,
+            min_max_min_val=MIN_VAL,
+            min_max_max_val=MAX_VAL,
+            is_brain_extraction=IS_BRAIN_EXTRACTION,
+            brain_extraction_modality=MODALITY,
+            brain_extraction_verbose=VERBOSE,
+            is_crop=IS_CROP,
+            is_smooth=IS_SMOOTH,
+            smooth_sigma=SIGMA,
+            smooth_order=ORDER,
+            smooth_mode=MODE,
+            smooth_cval=CVAL,
+            smooth_truncate=TRUNCATE,
+            is_re_normalize_after_smooth=IS_RE_NORMALIZE_AFTER_SMOOTH,
+            is_preprocess_test_set=IS_PREPROCESS_TEST_SET,
+            output_dir=PREPROCESSED_DATA_DIR,
+        )
         logger.info("Preprocessing completed.")
     else:
         logger.info("Preprocessing was skipped.")
@@ -178,16 +179,17 @@ def main():
             augmentations.append(("rotation", {"angle": ROTATION_ANGLE}))
 
         if IS_GAUSSIAN_NOISE:
-            augmentations.append(("gaussian_noise", {"mean": GAUSSIAN_NOISE_MEAN, "std": GAUSSIAN_NOISE_STD}))
+            augmentations.append(("gaussian_noise", {
+                "mean": GAUSSIAN_NOISE_MEAN,
+                "std": GAUSSIAN_NOISE_STD
+            }))
 
-        augment_images(
-            augmentations=augmentations,
-            num_augmentations=HOW_MANY_AUGMENTATIONS,
-            raw_nii_dir=RAW_NII_DATA_DIR,
-            train_set_dir=TRAIN_SET_DIR,
-            preprocessed_train_set_dir=PREPROCESSED_DATA_DIR,
-            output_dir=AUGMENTED_DATA_DIR
-        )
+        augment_images(augmentations=augmentations,
+                       num_augmentations=HOW_MANY_AUGMENTATIONS,
+                       raw_nii_dir=RAW_NII_DATA_DIR,
+                       train_set_dir=TRAIN_SET_DIR,
+                       preprocessed_train_set_dir=PREPROCESSED_DATA_DIR,
+                       output_dir=AUGMENTED_DATA_DIR)
         logger.info("Augmentation completed.")
     else:
         logger.info("Augmentation was skipped.")
@@ -200,17 +202,18 @@ def main():
     Saves the extracted features in data/raw_nii/train_set/extracted_features.
     """
     if IS_PERFORM_FEATURE_EXTRACTION:
-        feature_extraction_pipeline(raw_nii_dir=RAW_NII_DATA_DIR,
-                                    train_set_dir=TRAIN_SET_DIR,
-                                    test_set_dir=TEST_SET_DIR,
-                                    preprocessed_set_dir=PREPROCESSED_DATA_DIR,
-                                    labels_dir=LABELS_DIR,
-                                    extracted_features_dir=EXTRACTED_FEATURES_DIR,
-                                    target_shape=TARGET_SHAPE,
-                                    batch_size=BATCH_SIZE,
-                                    feature_extraction_model=BASE_MODEL_NAME,
-                                    base_model_weights=BASE_MODEL_WEIGHTS,
-                                    input_channels=INPUT_CHANNELS)
+        feature_extraction_pipeline(
+            raw_nii_dir=RAW_NII_DATA_DIR,
+            train_set_dir=TRAIN_SET_DIR,
+            test_set_dir=TEST_SET_DIR,
+            preprocessed_set_dir=PREPROCESSED_DATA_DIR,
+            labels_dir=LABELS_DIR,
+            extracted_features_dir=EXTRACTED_FEATURES_DIR,
+            target_shape=TARGET_SHAPE,
+            batch_size=BATCH_SIZE,
+            feature_extraction_model=BASE_MODEL_NAME,
+            base_model_weights=BASE_MODEL_WEIGHTS,
+            input_channels=INPUT_CHANNELS)
         logger.info("Feature extraction completed.")
     else:
         logger.info("Feature extraction was skipped.")
@@ -226,12 +229,11 @@ def main():
     """
     if IS_PERFORM_CLASSIFICATION:
         train_and_evaluate(extracted_features_dir=EXTRACTED_FEATURES_DIR,
-                        dir_to_save_clf=SAVE_CLF_DIR,
-                        results_output_dir=RESULTS_OUTPUT_DIR,
-                        clf_kernel=KERNEL,
-                        clf_c_value=C,
-                        clf_gamma=GAMMA
-                        )
+                           dir_to_save_clf=SAVE_CLF_DIR,
+                           results_output_dir=RESULTS_OUTPUT_DIR,
+                           clf_kernel=KERNEL,
+                           clf_c_value=C,
+                           clf_gamma=GAMMA)
         logger.info("Classifier training and validation completed.")
     else:
         logger.info("Classifier training and validation was skipped.")
@@ -244,7 +246,7 @@ def main():
     """
     if IS_PERFORM_PLOTTING:
         svm_visualizer = SVMVisualizer(results_json_path=RESULTS_OUTPUT_DIR,
-                                    save_figs_path=FIGS_OUTPUT_DIR)
+                                       save_figs_path=FIGS_OUTPUT_DIR)
         svm_visualizer.plot_confusion_matrix()
         svm_visualizer.plot_roc_curve()
         logger.info("Classifier metrics have been plotted.")
@@ -252,6 +254,7 @@ def main():
         logger.info("Plotting was skipped.")
 
     logger.info("The program completed successfully.")
+
 
 if __name__ == "__main__":
     main()
