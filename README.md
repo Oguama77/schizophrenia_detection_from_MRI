@@ -21,7 +21,7 @@ Example of the raw data:
 
 &check; Feature Extraction & Training: harnessed ResNet-18 to extract features and SVC to classify them;
 
-&check; Visualizing: obtained classifier metrics and compared results across experiments.
+&check; Visualization: obtained classifier metrics and compared results across experiments.
 
 #### Definitions and specifications
 
@@ -90,7 +90,7 @@ Parameters
 
 
 ## References
-We did not replicate a specific paper, but information from the following paper were referenced in the final report:  
+We did not replicate a specific paper, but information from the following papers were referenced in the final report:  
 1) Gengeç Benli, Ş., & Andaç, M. (2023). Constructing the schizophrenia recognition method employing GLCM features from multiple brain regions and machine learning techniques. Diagnostics, 13(13), 2140.
 2) Harestad, O. A. (2024). Sub-grouping Schizophrenia Spectrum Disorders using Deep Learning on Resting State fMRI (Master's thesis, The University of Bergen).
 3) Joyee, R. F., Rodoshi, L. H., & Nadia, Y. (2023). Application of deep learning in MRI classification of Schizophrenia (Doctoral dissertation, Brac University).
