@@ -3,10 +3,11 @@ base:
   raw_nii_data_dir: "data/raw_nii"
 
 eda:
+  is_perform_eda: False
   clinical_data_dir: "data/clinical_data.csv"
-  is_perform_eda: True
 
 dataset_preparation:
+  is_perform_dataset_preparation: True
   train_set_dir: "train_set"
   test_set_dir: "test_set"
   train_set_ratio: 0.76
@@ -14,6 +15,7 @@ dataset_preparation:
   normalization_method: "min-max"
 
 preprocessing_params:
+  is_perform_preprocessing: False
   preprocessed_data_dir: "preprocessed"
   is_normalize_when_preprocess: False
   is_brain_exaction: True
@@ -33,6 +35,7 @@ preprocessing_params:
   truncate: 2.0 
   
 augmentation_params:
+  is_perform_augmentation: False
   augmented_data_dir: "augmented"
   how_many_augmentations: 3
   is_translation: True
@@ -49,11 +52,13 @@ resnet_params:
   input_channels: 1
 
 feature_extraction_params:
+  is_perform_feature_extraction: True
   extracted_features_dir: "data/extracted_features"
   target_shape: [224, 224]
   batch_size: 64
   
 svc_params:
+  is_perform_classification: True
   save_clf_dir: "src/models/svm_classifier.pkl"
   results_output_dir: "src/models/results/classification_results.json"
   kernel: 'rbf'
@@ -61,4 +66,5 @@ svc_params:
   gamma: 0.0001
 
 plot_params:
+  is_perform_plotting: False
   figs_output_dir: "src/paper/figs"  
