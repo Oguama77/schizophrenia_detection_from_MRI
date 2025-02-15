@@ -325,7 +325,34 @@ def get_largest_brain_mask_slice(mask: np.ndarray) -> tuple[np.ndarray, int]:
 
     return binary_mask, largest_slice_index
 
-def crop_to_largest_bounding_box(data: np.ndarray, 
+def crop_to_largest_bounding_box(data: np.ndarray, mask: np.ndarray) -> np.ndarray:
+    """
+    Crop all slices to the bounding box of the largest brain area.
+    
+    Parameters:
+    - data: numpy array, 3D MRI data
+    - mask: numpy array, binary brain mask (3D)
+    
+    Returns:
+    - cropped_data: numpy array, cropped 3D MRI data
+    """
+    largest_slice_idx = np.argmax(np.sum(mask, axis=(0, 1)))  # Get slice with largest nonzero mask
+
+    largest_slice_mask = mask[:, :, largest_slice_idx]
+
+    coords = np.argwhere(largest_slice_mask > 0)
+    if coords.size == 0:  # If no brain region is found, return original data
+        print("Warning: No bounding box found. Returning original data.")
+        return data  # Or return np.zeros_like(data) if you prefer an empty image
+
+    x_min, y_min = coords.min(axis=0)
+    x_max, y_max = coords.max(axis=0) + 1  # Inclusive
+
+    cropped_slices = data[x_min:x_max, y_min:y_max, :]
+    return cropped_slices
+
+
+'''def crop_to_largest_bounding_box(data: np.ndarray, 
                                  processed_mask: np.ndarray = None, 
                                  largest_slice_idx: int = None,
                                  mask: np.ndarray = None
@@ -355,7 +382,7 @@ def crop_to_largest_bounding_box(data: np.ndarray,
     # Crop all slices using the bounding box dimensions
     cropped_slices = data[x_min:x_max, y_min:y_max, :]
 
-    return cropped_slices
+    return cropped_slices'''
 
 def apply_gaussian_smoothing(data, 
                              sigma=1.5, 
