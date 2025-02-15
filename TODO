@@ -1,4 +1,3 @@
-check toml packages
 
 in README: indicate Important definitions and explanations of key parameters/configurations.
 
@@ -15,7 +14,6 @@ use logger everywhere
 
 ???If you need to add a comment explaining a code block, consider extracting it into a separate function
 
-integrate config for constants and predefined settings.
 
 VISUALS: Ensure readability: use appropriate font sizes, tick labels, axes labels, and legends.
 ENSURE dedicated functions for plots.
