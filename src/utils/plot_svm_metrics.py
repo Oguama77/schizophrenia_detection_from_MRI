@@ -7,7 +7,7 @@ from sklearn.metrics import confusion_matrix, roc_curve, auc
 
 
 class SVMVisualizer:
-    def __init__(self, results_json_path):
+    def __init__(self, results_json_path, save_figs_path:str = "paper/figs"):
         """
         Initializes the visualization class and loads classification results.
 
@@ -16,6 +16,7 @@ class SVMVisualizer:
         """
         self.results_json_path = results_json_path
         self.results = self._load_results()
+        self.save_figs_path = save_figs_path
 
     def _load_results(self):
         """Loads classification results from the JSON file."""
@@ -34,13 +35,14 @@ class SVMVisualizer:
         # Get unique class names if labels are more than just 0 and 1
         unique_classes = sorted(set(y_test))
 
-        plt.figure(figsize=(6, 5))
+        fig = plt.figure(figsize=(6, 5))
         sns.heatmap(conf_matrix, annot=True, fmt='d', cmap='Blues', 
                     xticklabels=unique_classes, yticklabels=unique_classes)
         plt.xlabel('Predicted Labels')
         plt.ylabel('True Labels')
         plt.title('Confusion Matrix')
-        plt.show()
+        fig.savefig(self.save_figs_path+"cm"+".png")
+        #plt.show()
 
     def plot_roc_curve(self):
         """Plots the ROC curve."""
@@ -55,11 +57,12 @@ class SVMVisualizer:
 
         roc_auc = auc(fpr, tpr)
 
-        plt.figure(figsize=(6, 5))
+        fig = plt.figure(figsize=(6, 5))
         plt.plot(fpr, tpr, color='blue', label=f'ROC curve (AUC = {roc_auc:.2f})')
         plt.plot([0, 1], [0, 1], color='gray', linestyle='--')
         plt.xlabel('False Positive Rate')
         plt.ylabel('True Positive Rate')
         plt.title('Receiver Operating Characteristic (ROC) Curve')
         plt.legend()
-        plt.show()
+        fig.savefig(self.save_figs_path+"roc"+".png")
+        #plt.show()

@@ -35,8 +35,11 @@ preprocessing_params:
 augmentation_params:
   augmented_data_dir: "augmented"
   how_many_augmentations: 3
+  is_translation: True
   translation_shift: 5
+  is_rotation: True
   rotation_angle: 10
+  is_gaussian_noise: False
   gaussian_noise_mean: 0
   gaussian_noise_std: 0.1
 
@@ -56,3 +59,6 @@ svc_params:
   kernel: 'rbf'
   C: 100
   gamma: 0.0001
+
+plot_params:
+  figs_output_dir: "src/paper/figs"  

@@ -51,8 +51,11 @@ def main():
 
     AUGMENTED_DATA_DIR = config_data.augmentation_params.augmented_data_dir
     HOW_MANY_AUGMENTATIONS = config_data.augmentation_params.how_many_augmentations  # 4
+    IS_TRANSLATION = config_data.augmentation_params.is_translation
     TRANSLATION_SHIFT = config_data.augmentation_params.translation_shift
+    IS_ROTATION = config_data.augmentation_params.is_rotation
     ROTATION_ANGLE = config_data.augmentation_params.rotation_angle
+    IS_GAUSSIAN_NOISE = config_data.augmentation_params.is_gaussian_noise
     GAUSSIAN_NOISE_MEAN = config_data.augmentation_params.gaussian_noise_mean
     GAUSSIAN_NOISE_STD = config_data.augmentation_params.gaussian_noise_std
 
@@ -71,6 +74,7 @@ def main():
     C = config_data.svc_params.C
     GAMMA = config_data.svc_params.gamma
 
+    FIGS_OUTPUT_DIR = config_data.plot_params.figs_output_dir
 
     # Step 0: Explanatory data analysis
     """
@@ -87,6 +91,7 @@ def main():
         logger.info("EDA completed.")
     else:
         logger.info("EDA was skipped.")    
+
 
     # Step 1: Select the data (train, test)
     """
@@ -110,6 +115,7 @@ def main():
                     min_max_min_val=MIN_VAL,
                     min_max_max_val=MAX_VAL)
     logger.info("Dataset preparation completed.")
+
 
     # Step 2: Preprocessing
     """
@@ -148,25 +154,27 @@ def main():
                       )
     logger.info("Preprocessing completed.")
 
+
     # Step 3: Augmentation
     """
     Applies specified augmentation type (translation, rotation, gaussian_noise, or combined)
     to the preprocessed train set images located in data/raw_nii/train_set/preprocessed,
     Saves augmented images in data/raw_nii/train_set/preprocessed/augmented.
     """
+    # Construct augmentation list based on config
+    augmentations = []
+
+    if IS_TRANSLATION:
+        augmentations.append(("translation", {"shift": TRANSLATION_SHIFT}))
+
+    if IS_ROTATION:
+        augmentations.append(("rotation", {"angle": ROTATION_ANGLE}))
+
+    if IS_GAUSSIAN_NOISE:
+        augmentations.append(("gaussian_noise", {"mean": GAUSSIAN_NOISE_MEAN, "std": GAUSSIAN_NOISE_STD}))
+
     augment_images(
-        augmentations=[
-            ("translation", {
-                "shift": TRANSLATION_SHIFT # 5
-            }),
-            ("rotation", {
-                "angle": ROTATION_ANGLE # 10
-            }),
-            ("gaussian_noise", {
-                "mean": GAUSSIAN_NOISE_MEAN,
-                "std": GAUSSIAN_NOISE_STD # 0.1
-            }),
-        ],
+        augmentations=augmentations,
         num_augmentations=HOW_MANY_AUGMENTATIONS,
         raw_nii_dir=RAW_NII_DATA_DIR,
         train_set_dir=TRAIN_SET_DIR,
@@ -174,6 +182,7 @@ def main():
         output_dir=AUGMENTED_DATA_DIR
     )
     logger.info("Augmentation completed.")
+
 
     # Step 4: Feature extraction stage (ResNet)
     """
@@ -196,6 +205,7 @@ def main():
                                 input_channels=INPUT_CHANNELS)
     logger.info("Feature extraction completed.")
 
+
     # Step 5: Model training and validation (SVC)
     """
     Trains a classifier using the extracted features located in 
@@ -214,12 +224,15 @@ def main():
                        )
     logger.info("Classifier training and validation completed.")
 
+
     # Step 6: Plot model (SVC) metrics
     """
     Plots model metrics (accuracy, precision, recall, f1-score) on the test set.
     The results are loaded from src/models/results.
+    Plots are saved in paper/figs.
     """
-    svm_visualizer = SVMVisualizer(results_json_path=RESULTS_OUTPUT_DIR)
+    svm_visualizer = SVMVisualizer(results_json_path=RESULTS_OUTPUT_DIR,
+                                   save_figs_path=FIGS_OUTPUT_DIR)
     svm_visualizer.plot_confusion_matrix()
     svm_visualizer.plot_roc_curve()
     logger.info("Classifier metrics have been plotted.")
