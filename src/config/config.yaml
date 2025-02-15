@@ -10,7 +10,7 @@ dataset_preparation:
   is_perform_dataset_preparation: True
   train_set_dir: "train_set"
   test_set_dir: "test_set"
-  train_set_ratio: 0.76
+  train_set_ratio: 0.80
   is_normalize_when_preparing: True
   normalization_method: "min-max"
 
@@ -52,13 +52,13 @@ resnet_params:
   input_channels: 1
 
 feature_extraction_params:
-  is_perform_feature_extraction: True
+  is_perform_feature_extraction: False
   extracted_features_dir: "data/extracted_features"
   target_shape: [224, 224]
   batch_size: 64
   
 svc_params:
-  is_perform_classification: True
+  is_perform_classification: False
   save_clf_dir: "src/models/svm_classifier.pkl"
   results_output_dir: "src/models/results/classification_results.json"
   kernel: 'rbf'

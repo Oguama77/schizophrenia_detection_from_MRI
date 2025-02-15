@@ -4,7 +4,7 @@ from utils.eda import SchizophreniaEDA
 from utils.dataset_preparation import prepare_dataset
 from utils.preprocessing import preprocess_images
 from utils.augment_images import augment_images
-from utils.feature_extractor import feature_extraction_pipeline
+#from utils.feature_extractor import feature_extraction_pipeline
 from utils.classifier import train_and_evaluate
 from utils.plot_svm_metrics import SVMVisualizer
 
@@ -13,7 +13,7 @@ def main():
     logger.info("The program started...")
 
     # Load configuration from a config file
-    config_data = OmegaConf.load('config/config.yaml')
+    config_data = OmegaConf.load('src/config/config.yaml')
 
     # Accessing parameters
     RAW_PT_DATA_DIR = config_data.base.raw_pt_data_dir
@@ -25,8 +25,8 @@ def main():
     IS_PERFORM_DATASET_PREPARATION = config_data.dataset_preparation.is_perform_dataset_preparation
     TRAIN_SET_DIR = config_data.dataset_preparation.train_set_dir
     TEST_SET_DIR = config_data.dataset_preparation.test_set_dir
-    TRAIN_SET_RATIO = config_data.dataset_preparation.train_set_ratio  # 0.24: 50 - train, 12 - test
-    IS_NORMALIZE_WHEN_PREPARING = config_data.dataset_preparation.is_normalize_when_preparing  # True False
+    TRAIN_SET_RATIO = config_data.dataset_preparation.train_set_ratio  # 0.80: 50 - train, 12 - test
+    IS_NORMALIZE_WHEN_PREPARING = config_data.dataset_preparation.is_normalize_when_preparing
     NORMALIZATION_METHOD = config_data.dataset_preparation.normalization_method  # min-max
 
     IS_PERFORM_PREPROCESSING = config_data.preprocessing_params.is_perform_preprocessing
@@ -38,7 +38,7 @@ def main():
     IS_RE_NORMALIZE_AFTER_SMOOTH = config_data.preprocessing_params.is_re_normalize_after_smooth
     IS_PREPROCESS_TEST_SET = config_data.preprocessing_params.is_preprocess_test_set
 
-    VOXEL_SIZE = config_data.preprocessing_params.voxel_size
+    VOXEL_SIZE = tuple(config_data.preprocessing_params.voxel_size)
     MIN_VAL = config_data.preprocessing_params.min_val
     MAX_VAL = config_data.preprocessing_params.max_val
     MODALITY = config_data.preprocessing_params.modality
@@ -51,7 +51,7 @@ def main():
 
     IS_PERFORM_AUGMENTATION = config_data.augmentation_params.is_perform_augmentation
     AUGMENTED_DATA_DIR = config_data.augmentation_params.augmented_data_dir
-    HOW_MANY_AUGMENTATIONS = config_data.augmentation_params.how_many_augmentations  # 4
+    HOW_MANY_AUGMENTATIONS = config_data.augmentation_params.how_many_augmentations
     IS_TRANSLATION = config_data.augmentation_params.is_translation
     TRANSLATION_SHIFT = config_data.augmentation_params.translation_shift
     IS_ROTATION = config_data.augmentation_params.is_rotation
@@ -67,7 +67,7 @@ def main():
 
     LABELS_DIR = config_data.eda.clinical_data_dir
     EXTRACTED_FEATURES_DIR = config_data.feature_extraction_params.extracted_features_dir
-    TARGET_SHAPE = config_data.feature_extraction_params.target_shape
+    TARGET_SHAPE = tuple(config_data.feature_extraction_params.target_shape)
     BATCH_SIZE = config_data.feature_extraction_params.batch_size
 
     IS_PERFORM_CLASSIFICATION = config_data.svc_params.is_perform_classification
@@ -77,7 +77,7 @@ def main():
     C = config_data.svc_params.C
     GAMMA = config_data.svc_params.gamma
 
-    IS_PERFORM_PLOTTING = config_data.svc_params.is_perform_plotting
+    IS_PERFORM_PLOTTING = config_data.plot_params.is_perform_plotting
     FIGS_OUTPUT_DIR = config_data.plot_params.figs_output_dir
 
     # Step 0: Explanatory data analysis
@@ -110,7 +110,6 @@ def main():
     """
     if IS_PERFORM_DATASET_PREPARATION:
         prepare_dataset(train_ratio=TRAIN_SET_RATIO,
-                        raw_pt_dir=RAW_PT_DATA_DIR,
                         raw_nii_dir=RAW_NII_DATA_DIR,
                         train_set_output_dir=TRAIN_SET_DIR,
                         test_set_output_dir=TEST_SET_DIR,
@@ -139,26 +138,25 @@ def main():
     """
     if IS_PERFORM_PREPROCESSING:
         preprocess_images(raw_nii_dir=RAW_NII_DATA_DIR,
-                        train_set_dir=TRAIN_SET_DIR,
-                        test_set_dir=TEST_SET_DIR,
-                        is_normalize=IS_NORMALIZE_WHEN_PREPROCESS,
-                        norm_metod=NORMALIZATION_METHOD,
-                        min_max_min_val=MIN_VAL,
-                        min_max_max_val=MAX_VAL,
-                        is_brain_extraction=IS_BRAIN_EXTRACTION,
-                        brain_extraction_modality=MODALITY,
-                        brain_extraction_verbose=VERBOSE,
-                        is_crop=IS_CROP,
-                        is_smooth=IS_SMOOTH,
-                        smooth_sigma=SIGMA,
-                        smooth_order=ORDER,
-                        smooth_mode=MODE,
-                        smooth_cval=CVAL,
-                        smooth_truncate=TRUNCATE,
-                        is_re_normalize_after_smooth=IS_RE_NORMALIZE_AFTER_SMOOTH,
-                        is_preprocess_test_set=IS_PREPROCESS_TEST_SET,
-                        output_dir=PREPROCESSED_DATA_DIR,
-                        )
+                          train_set_dir=TRAIN_SET_DIR,
+                          test_set_dir=TEST_SET_DIR,
+                          is_normalize=IS_NORMALIZE_WHEN_PREPROCESS,
+                          norm_metod=NORMALIZATION_METHOD,
+                          min_max_min_val=MIN_VAL,
+                          min_max_max_val=MAX_VAL,
+                          is_brain_extraction=IS_BRAIN_EXTRACTION,
+                          brain_extraction_modality=MODALITY,
+                          brain_extraction_verbose=VERBOSE,
+                          is_crop=IS_CROP,
+                          is_smooth=IS_SMOOTH,
+                          smooth_sigma=SIGMA,
+                          smooth_order=ORDER,
+                          smooth_mode=MODE,
+                          smooth_cval=CVAL,
+                          smooth_truncate=TRUNCATE,
+                          is_re_normalize_after_smooth=IS_RE_NORMALIZE_AFTER_SMOOTH,
+                          is_preprocess_test_set=IS_PREPROCESS_TEST_SET,
+                          output_dir=PREPROCESSED_DATA_DIR)
         logger.info("Preprocessing completed.")
     else:
         logger.info("Preprocessing was skipped.")
