@@ -1,6 +1,7 @@
 import os
 import torch
 import pandas as pd
+from logger import logger
 import matplotlib.pyplot as plt
 from typing import Optional, Dict, List, Any
 from utils.preprocess_validation import calculate_metrics
@@ -134,7 +135,7 @@ class SchizophreniaEDA:
                 raw_metrics = calculate_metrics(None, tensor_numpy)
                 raw_metrics_all_images.append(raw_metrics)
             except Exception as e:
-                print(f"Error processing {file_path}: {e}")
+                logger.error(f"Error processing {file_path}: {e}")
 
         return raw_metrics_all_images
 
@@ -154,6 +155,6 @@ class SchizophreniaEDA:
         if raw_metrics_all_images:
             df_raw_metrics = pd.DataFrame(raw_metrics_all_images)
             df_raw_metrics.to_csv(save_path, index=False)
-            print(f"Raw image metrics saved to {save_path}")
+            logger.info(f"Raw image metrics saved to {save_path}")
         else:
-            print("No metrics computed. Check the input directory.")
+            logger.info("No metrics computed. Check the input directory.")

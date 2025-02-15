@@ -206,7 +206,6 @@ def main():
                                     train_set_dir=TRAIN_SET_DIR,
                                     test_set_dir=TEST_SET_DIR,
                                     preprocessed_set_dir=PREPROCESSED_DATA_DIR,
-                                    augmented_train_set_dir=AUGMENTED_DATA_DIR,
                                     labels_dir=LABELS_DIR,
                                     extracted_features_dir=EXTRACTED_FEATURES_DIR,
                                     target_shape=TARGET_SHAPE,
@@ -253,7 +252,7 @@ def main():
         logger.info("Classifier metrics have been plotted.")
     else:
         logger.info("Plotting was skipped.")
-        
+
     logger.info("The program completed successfully.")
 
 if __name__ == "__main__":

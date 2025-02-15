@@ -4,6 +4,7 @@ import antspynet
 import numpy as np
 import nibabel as nib
 from typing import Union
+from logger import logger
 from scipy.ndimage import gaussian_filter
 from skimage.filters import threshold_otsu
 from nibabel.processing import resample_to_output 
@@ -302,7 +303,7 @@ def crop_to_largest_bounding_box(data: np.ndarray, mask: np.ndarray) -> np.ndarr
 
     coords = np.argwhere(largest_slice_mask > 0)
     if coords.size == 0:  # If no brain region is found, return original data
-        print("Warning: No bounding box found. Returning original data.")
+        logger.info("Warning: No bounding box found. Returning original data.")
         return data  # Or return np.zeros_like(data) if you prefer an empty image
 
     x_min, y_min = coords.min(axis=0)

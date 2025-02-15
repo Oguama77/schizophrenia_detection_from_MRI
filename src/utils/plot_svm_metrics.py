@@ -3,7 +3,7 @@ import json
 import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
-from sklearn.metrics import confusion_matrix, roc_curve, auc
+from sklearn.metrics import confusion_matrix, ConfusionMatrixDisplay, roc_curve, auc
 
 
 class SVMVisualizer:
@@ -33,14 +33,19 @@ class SVMVisualizer:
         conf_matrix = np.array(self.results["confusion_matrix"])
 
         # Get unique class names if labels are more than just 0 and 1
-        unique_classes = sorted(set(y_test))
+        #unique_classes = sorted(set(y_test))
 
         fig = plt.figure(figsize=(6, 5))
-        sns.heatmap(conf_matrix, annot=True, fmt='d', cmap='Blues', 
-                    xticklabels=unique_classes, yticklabels=unique_classes)
-        plt.xlabel('Predicted Labels')
-        plt.ylabel('True Labels')
-        plt.title('Confusion Matrix')
+        cm = confusion_matrix(y_test, test_preds)
+        disp = ConfusionMatrixDisplay(confusion_matrix=cm, display_labels=['Non-Schizophrenic', 'Schizophrenic'])
+        disp.plot(cmap='Blues')
+        plt.title("Confusion Matrix: Test Set")
+
+        #sns.heatmap(conf_matrix, annot=True, fmt='d', cmap='Blues', 
+        #            xticklabels=unique_classes, yticklabels=unique_classes)
+        #plt.xlabel('Predicted Labels')
+        #plt.ylabel('True Labels')
+        #plt.title('Confusion Matrix')
         fig.savefig(self.save_figs_path+"cm"+".png")
         #plt.show()
 

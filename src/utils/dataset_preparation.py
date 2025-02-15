@@ -2,6 +2,7 @@ import os
 import shutil
 import random
 import torch
+from logger import logger
 from src.utils.preprocess import load_nii, resample_image, normalize_data
 
 
@@ -77,6 +78,4 @@ def prepare_dataset(train_ratio: float = 0.76,
     process_and_save_nii(train_images, raw_nii_dir, train_nii_dir)
     process_and_save_nii(test_images, raw_nii_dir, test_nii_dir)
 
-    print(
-        f"Dataset prepared: {len(train_images)} images in train_set, {len(test_images)} images in test_set."
-    )
+    logger.info(f"Dataset prepared: {len(train_images)} images in train_set, {len(test_images)} images in test_set.")

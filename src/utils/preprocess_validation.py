@@ -2,6 +2,7 @@ from typing import Union
 import matplotlib.pyplot as plt
 import nibabel as nib
 import numpy as np
+from logger import logger
 from skimage.filters import threshold_otsu
 from skimage.metrics import mean_squared_error
 from skimage.metrics import structural_similarity as ssim
@@ -140,7 +141,7 @@ def generate_signal_mask(data: np.ndarray,
     # Filter non-zero values for Otsu's thresholding
     non_zero_data = data[data > 0]
     if non_zero_data.size == 0:
-        print(
+        logger.info(
             "Warning: No non-zero data found for thresholding. Returning a zero mask."
         )
         return np.zeros_like(data, dtype=np.uint8)
@@ -173,7 +174,7 @@ def calculate_snr_with_mask(data: np.ndarray,
 
     # Check if the mask has any valid signal region
     if np.sum(mask) == 0:
-        print(
+        logger.info(
             "Warning: The mask contains no signal region. Assigning SNR value of 0."
         )
         return 0.0
