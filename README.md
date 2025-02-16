@@ -35,6 +35,16 @@ Parameters
 |   schizo.code-workspace       -> Workspace settings
 |   tox.ini                     -> Test automation
 |
++---data
+|   |   clinical_data.csv   -> Clinical data for EDA
+|   |   metrics_data.csv    -> Summary of classification metrics across experiments
+|   |
+|   +---eda
+|   |       age_statistics.csv    -> Age statistics of schiz and non-schiz subjects
+|   |       raw_image_metrics.csv -> Quantitative metrics of raw images
+|   |       schiz_age.png         -> Plot of dataset age distribution 
+|   |       schiz_gen.png         -> Plot of dataset gender distribution
+|   |
 +---src
 |   |   logger.py               -> Track errors and debugging information
 |   |   main.py                 -> Main project logic and entrypoint
@@ -43,16 +53,13 @@ Parameters
 |   +---config
 |   |       config.yaml         -> Configuration settings, paths and parameters
 |   |
-|   +---data
-|   |       clinical_data.csv   -> Clinical data for EDA
-|   |       metrics_data.csv    -> Summary of classification metrics across experiments
-|   |
 |   +---models
 |   |       cnn.py              -> Architecture for feature extraction
 |   |       svm.py              -> Support vector classifier
 |   |       __init__.py
 |   |
 |   +---paper
+|   |   |   paper.bbl
 |   |   |   paper.bib           -> Formatting report citations
 |   |   |   paper.pdf           -> Actual report in PDF format
 |   |   |   paper.tex           -> LaTeX source document for report
@@ -62,8 +69,8 @@ Parameters
 |   |   \---figs
 |   |           brain_extraction_image.png  -> MRI slice after brain extraction
 |   |           eval_final_model.png        -> Visualization of final training results
-|   |           metrics_comparison.png      -> Plot of metrics comparison across all experiments
 |   |           model_architecture.png      -> Project workflow and model architecture
+|   |           model_metrics_comparison.png-> Plot of metrics comparison across all experiments
 |   |           raw_image.png               -> Unprocessed MRI slice
 |   |           sample_volume.png           -> Plot of 3D MRI volume in 2D
 |   |           slice_comparison.png        -> MRI slice comparison before and after preprocessing
@@ -108,10 +115,15 @@ We did not replicate a specific paper, but information from the following papers
 ## Instructions to run the project:
 All command should run under project root/working-directory
 ```bash 
+# clone the repository
+git clone https://github.com/Eager1Beaver/schizo.git
+cd schizo
 # install Virtualenv is - a tool to set up your Python environments
 pip install virtualenv
 # create virtual environment (serve only this project):
 python -m venv venv
+source venv/bin/activate  # On macOS/Linux
+venv\Scripts\activate  # On Windows
 # activate virtual environment
 venv\Scripts\activate # Windows
 source venv/bin/activate # Linux
