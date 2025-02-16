@@ -5,9 +5,10 @@ base:
 eda:
   is_perform_eda: False
   clinical_data_dir: "data/clinical_data.csv"
+  output_path: "data/eda"
 
 dataset_preparation:
-  is_perform_dataset_preparation: True
+  is_perform_dataset_preparation: False
   train_set_dir: "train_set"
   test_set_dir: "test_set"
   train_set_ratio: 0.80

@@ -11,8 +11,9 @@ class SchizophreniaEDA:
     """Performs exploratory data analysis (EDA) on the clinical data and calculates image metrics"""
 
     def __init__(self,
-                 path_to_clinical_data: str,
-                 path_to_raw_images: Optional[str] = None) -> None:
+                 path_to_clinical_data: str = "data/clinical_data.csv",
+                 path_to_raw_images: Optional[str] = "data/raw_pt",
+                 output_path: str = "data/eda") -> None:
         """
         Initializes the SchizophreniaEDA class with paths to clinical and raw imaging data.
 
@@ -27,6 +28,7 @@ class SchizophreniaEDA:
         self.schiz_df: pd.DataFrame = self._add_schiz_column()
         self._create_age_groups()
         self.path_to_raw_images: Optional[str] = path_to_raw_images
+        self.output_path = output_path
 
     def _add_schiz_column(self) -> pd.DataFrame:
         """
@@ -70,7 +72,7 @@ class SchizophreniaEDA:
         plt.legend(title='Diagnosis', bbox_to_anchor=[1, 0.9])
         plt.tight_layout()
         plt.show()
-        fig.get_figure().savefig(save_path)
+        fig.get_figure().savefig(self.output_path + "/" + save_path)
 
     def plot_gender_distribution(self, save_path='schiz_gen.png') -> None:
         """
@@ -94,7 +96,7 @@ class SchizophreniaEDA:
         plt.legend(title='Diagnosis', bbox_to_anchor=[1, 0.9])
         plt.tight_layout()
         plt.show()
-        fig.get_figure().savefig(save_path)
+        fig.get_figure().savefig(self.output_path + "/ " +save_path)
 
     def get_age_statistics(self) -> Dict[str, pd.Series]:
         """
@@ -110,6 +112,23 @@ class SchizophreniaEDA:
             "No Schizophrenia": df_ns["age"].describe()
         }
 
+    def save_age_statistics(self, filename: str = "age_statistics.csv"):
+        """
+        Computes age statistics and saves them to a CSV file.
+
+        Args:
+            filename (str): The name of the CSV file to save the statistics.
+        """
+        age_stats = self.get_age_statistics()
+
+        # Convert dictionary to DataFrame
+        df_stats = pd.DataFrame(age_stats)
+
+        # Transpose so that the statistics are rows and groups are columns
+        df_stats.to_csv(self.output_path + "/" + filename, index=True)
+
+        print(f"Statistics saved to {filename}")
+
     def assess_raw_images(self) -> List[Dict[str, Any]]:
         """
         Assesses the quality of raw MRI images using predefined metrics.
@@ -123,7 +142,6 @@ class SchizophreniaEDA:
                 f"Path {self.path_to_raw_images} does not exist.")
 
         raw_metrics_all_images = []
-
         for file_name in os.listdir(self.path_to_raw_images):
             if not file_name.endswith(".pt"):
                 continue  # Skip non-PT files
@@ -133,10 +151,10 @@ class SchizophreniaEDA:
                 loaded_tensor = torch.load(file_path)
                 tensor_numpy = loaded_tensor.numpy()
                 raw_metrics = calculate_metrics(None, tensor_numpy)
+                raw_metrics["file_path"] = file_path
                 raw_metrics_all_images.append(raw_metrics)
             except Exception as e:
                 logger.error(f"Error processing {file_path}: {e}")
-
         return raw_metrics_all_images
 
     def save_raw_images_metrics(self,
@@ -154,6 +172,7 @@ class SchizophreniaEDA:
         raw_metrics_all_images = self.assess_raw_images()
         if raw_metrics_all_images:
             df_raw_metrics = pd.DataFrame(raw_metrics_all_images)
+            save_path = self.output_path + "/" + save_path
             df_raw_metrics.to_csv(save_path, index=False)
             logger.info(f"Raw image metrics saved to {save_path}")
         else:
