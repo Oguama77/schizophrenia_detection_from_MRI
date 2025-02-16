@@ -84,7 +84,7 @@ Table~\ref{tab:preprocessing_pipeline} presents the preprocessing techniques use
 \begin{figure}[h]
     \centering
     \includegraphics[width=0.6\textwidth]{./figs/slice_comparison.png} % test_pipeline.png
-    \caption{Panel A shows a slice of a raw scan. Panel B shows a slice of a preprocessed scan. For preprocessed scans, the standard deviation of SNR values is relatively low (\mbox{$SNR= 25 \pm 1$}), which ensures consistency in the image quality and prevents the model from making predictions based on possible artifacts.}\label{fig:slice_comparison}
+    \caption{Panel A shows a slice of a raw scan. Panel B shows a slice of a preprocessed scan. For preprocessed scans, the standard deviation of SNR values is relatively low (\mbox{$SNR= 25 \pm 2$}), which ensures consistency in the image quality and prevents the model from making predictions based on possible artifacts.}\label{fig:slice_comparison}
 \end{figure}
 
 \subsubsection{Resampling}
@@ -222,10 +222,6 @@ When combining preprocessing techniques, the pattern is less straightforward. Th
 \subsection{Data Augmentation}
 
 The results presented in Table~\ref{tab:model_meetrics_augmentation} highlight the impact of various data augmentation methods on model performance. The baseline model using raw data (0) achieved an accuracy of 0.51 and an F1-score of 0.63. In contrast, applying translation (6) significantly improved both accuracy (75\%) and F1-score (0.79), with a notable increase in recall (0.84), indicating that translation is effective at boosting model performance and sensitivity.
-
-Rotation (7) further improved results, with the highest accuracy (79\%) and F1-score (0.80), alongside strong recall (0.81) and precision (0.78), demonstrating its ability to enhance both model robustness and overall performance.
-
-Gaussian noise (8), however, led to a substantial decrease in performance, with an accuracy of only 33\% and a low F1-score of 0.40. This suggests that adding noise may negatively affect the model, potentially obscuring relevant patterns in the data.
 \begin{center}
 	\begin{table}[t]
 		\centering
@@ -243,20 +239,21 @@ Gaussian noise (8), however, led to a substantial decrease in performance, with 
 		\end{tabular*}
 	\end{table}
 \end{center}
+Rotation (7) further improved results, with the highest accuracy (79\%) and F1-score (0.80), alongside strong recall (0.81) and precision (0.78), demonstrating its ability to enhance both model robustness and overall performance.
+
+Gaussian noise (8), however, led to a substantial decrease in performance, with an accuracy of only 33\% and a low F1-score of 0.40. This suggests that adding noise may negatively affect the model, potentially obscuring relevant patterns in the data.
+\begin{figure}
+    \centering
+    \includegraphics[width=1.0\textwidth]{./figs/eval_final_model.png} % 
+    \caption{Model evaluation for the final training. Preprocessing and augmentation steps: resampling + normalization + brain extraction + translation + rotation. Panel A: confusion matrix with recall of 0.98. Panel B: ROC curve with AUC of 0.86}\label{fig:eval_final_model}
+\end{figure}
 
 The final training combined the optimal combination of preprocessing with translation and rotation techniques (1+2+3+6+7), surpassing the accuracy and recall of all the experiments (81\% and 0.98 respectively), with a precision value only surpassed by the rotation experiment. Figure~\ref{fig:eval_final_model} shows the output of the final training and Figure~\ref{fig:model_metrics_comparison} shows the comparison between the metrics of all the preprocessing and augmentation experiments.
 \begin{figure}
     \centering
-    \includegraphics[width=0.8\textwidth]{./figs/eval_final_model.png} % 
-    \caption{Preprocessing and augmentation steps: resampling + normalization + brain extraction + translation + rotation. Panel A: confusion matrix with recall of 0.98. Panel B: ROC curve with AUC of 0.86}\label{fig:eval_final_model}
+    \includegraphics[width=1.0\textwidth]{./figs/model_metrics_comparison.png} % 
+    \caption{Summary of the metrics across different experiments. Panel A: comparison of accuracies across the experiments. The highest accuracy was recorded in the final experiment combining resampling, normalization, brain extraction, translation and rotation. Panel B: comparison of recall scores. The final experiment yielded the highest recall score. Panel C: comparison of precision scores. The rotation experiment produced the highest score, probably due to an increase in instances of the negative class after augmentation. The numbers along the y-axis represent preprocessing and augmentation scenarios: 0 --- raw images, 1 --- resampling, 2 --- normalization, 3 --- brain extraction, 4 --- cropping, 5 --- smoothing, 6 --- translation, 7 --- rotation, 8 --- Gaussian noise.}\label{fig:model_metrics_comparison}
 \end{figure}
-
-\begin{figure}
-    \centering
-    \includegraphics[width=0.8\textwidth]{./figs/model_metrics_comparison.png} % 
-    \caption{Summary of the metrics for each preprocessing experiment. Panel A: comparison of accuracies across the experiments. The highest accuracy was recorded in the final experiment combining resampling, normalization, brain extraction, translation and rotation. Panel B: comparison of recall scores. The final experiment yielded the highest recall score. Panel C: comparison of precision scores. The rotation experiment produced the highest score, probably due to an increase in instances of the negative class after augmentation. The numbers along the y-axis represent preprocessing and augmentation scenarios: 0 --- raw images, 1 --- resampling, 2 --- normalization, 3 --- brain extraction, 4 --- cropping, 5 --- smoothing, 6 --- translation, 7 --- rotation, 8 --- Gaussian noise.}\label{fig:model_metrics_comparison}
-\end{figure}
-
 
 % Discussion
 \section{Discussion}

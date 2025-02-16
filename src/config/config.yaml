@@ -11,7 +11,7 @@ dataset_preparation:
   is_perform_dataset_preparation: False
   train_set_dir: "train_set"
   test_set_dir: "test_set"
-  train_set_ratio: 0.80
+  train_set_ratio: 0.81
   is_normalize_when_preparing: True
   normalization_method: "min-max"
 
@@ -21,7 +21,7 @@ preprocessing_params:
   is_normalize_when_preprocess: False
   is_brain_exaction: True
   is_crop: False
-  is_smooth: True
+  is_smooth: False
   is_re_normalize_after_smooth: False
   is_preprocess_test_set: False
   voxel_size: [2, 2, 2]
