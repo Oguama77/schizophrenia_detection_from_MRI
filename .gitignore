@@ -1,5 +1,6 @@
 /app
-/data
+/data/raw_nii
+/data/raw_pt
 /schizo
 /files_ignore
 /files_ignore_temp

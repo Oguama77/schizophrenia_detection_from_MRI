@@ -21,6 +21,7 @@ def main():
 
     CLINICAL_DATA_DIR = config_data.eda.clinical_data_dir
     IS_PERFORM_EDA = config_data.eda.is_perform_eda
+    OUTPUT_PATH_EDA = config_data.eda.output_path
 
     IS_PERFORM_DATASET_PREPARATION = config_data.dataset_preparation.is_perform_dataset_preparation
     TRAIN_SET_DIR = config_data.dataset_preparation.train_set_dir
@@ -87,10 +88,12 @@ def main():
     This step is optional and can be skipped if not necessary.
     """
     if IS_PERFORM_EDA:
-        eda = SchizophreniaEDA(CLINICAL_DATA_DIR, RAW_PT_DATA_DIR)
+        eda = SchizophreniaEDA(path_to_clinical_data=CLINICAL_DATA_DIR, 
+                               path_to_raw_images=RAW_PT_DATA_DIR,
+                               output_path=OUTPUT_PATH_EDA)
         eda.plot_age_distribution()
         eda.plot_gender_distribution()
-        eda.get_age_statistics()
+        eda.save_age_statistics()
         eda.save_raw_images_metrics()
         logger.info("EDA completed.")
     else:
