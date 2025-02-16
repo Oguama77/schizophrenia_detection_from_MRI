@@ -23,10 +23,6 @@ Example of the raw data:
 
 &check; Visualization: obtained classifier metrics and compared results across experiments.
 
-#### Definitions and specifications
-
-Parameters
-
 ### Repository Structure
 ```.
 |   .gitignore
@@ -40,10 +36,11 @@ Parameters
 |   |   metrics_data.csv    -> Summary of classification metrics across experiments
 |   |
 |   +---eda
-|   |       age_statistics.csv    -> Age statistics of schiz and non-schiz subjects
-|   |       raw_image_metrics.csv -> Quantitative metrics of raw images
-|   |       schiz_age.png         -> Plot of dataset age distribution 
-|   |       schiz_gen.png         -> Plot of dataset gender distribution
+|   |       age_statistics.csv             -> Age statistics of schiz and non-schiz subjects
+|   |       raw_image_metrics.csv          -> Quantitative metrics of raw images
+|   |       preprocessed_image_metrics.csv -> Quantitative metrics of pre-processed images
+|   |       schiz_age.png                  -> Plot of dataset age distribution 
+|   |       schiz_gen.png                  -> Plot of dataset gender distribution
 |   |
 +---src
 |   |   logger.py               -> Track errors and debugging information
