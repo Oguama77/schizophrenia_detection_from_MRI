@@ -40,6 +40,13 @@ Parameters
 |   |   main.py                 -> Main project logic and entrypoint
 |   |   __init__.py
 |   |
+|   +---config
+|   |       config.yaml         -> Configuration settings, paths and parameters
+|   |
+|   +---data
+|   |       clinical_data.csv   -> Clinical data for EDA
+|   |       metrics_data.csv    -> Summary of classification metrics across experiments
+|   |
 |   +---models
 |   |       cnn.py              -> Architecture for feature extraction
 |   |       svm.py              -> Support vector classifier

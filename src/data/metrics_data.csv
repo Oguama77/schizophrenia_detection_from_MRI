@@ -1,0 +1,15 @@
+Preprocessing/ Augmentation Technique,Accuracy (%),Recall,Precision,Description
+0,51,0.67,0.6,Raw images
+1,51,0.67,0.6,Resampling
+2,56,0.69,0.64,Normalization
+3,54,0.78,0.6,Brain extraction
+4,57,0.76,0.63,Cropping
+5,55,0.71,0.62,Smoothing
+6,75,0.84,0.74,Translation
+7,79,0.81,0.78,Rotation
+8,33,0.32,0.53,Gaussian Noise
+1+2,57,0.69,0.64,Resampling + Normalization
+1+2+3,55,0.8,0.61,Resampling + Normalization + Brain extraction
+1+2+3+4,44,0.53,0.56,Resampling + Normalization + Brain extraction + Cropping
+1+2+3+4+5,48,0.6,0.58,Resampling + Normalization + Brain extraction + Cropping + Smoothing
+1+2+3+6+7,81,0.98,0.77,Resampling + Normalization + Brain Extraction + Translation + Rotation
