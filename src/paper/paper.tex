@@ -8,18 +8,18 @@
 % Abstract
 \section{Abstract}
 
-\textbf{Background}\\
+\tab\textbf{Background}\\
 Schizophrenia (SZ) is a chronic mental disorder that presents challenges in accurate diagnosis due to its complex nature. Advances in machine learning (ML) and deep learning (DL) have shown promise in automating SZ detection using structural MRI, but variability in preprocessing methods remains a key challenge.
 \textbf{Aim}: This study aims to evaluate the impact of various preprocessing and data augmentation techniques on ML-based classification of schizophrenia from MRI data.
 
 \textbf{Methods}\\
-We utilized the COBRE dataset, which includes structural MRI data from 62 individuals, divided into 30 schizophrenia patients and 32 healthy controls. A support vector classifier (SVC) was employed to classify the data. Various preprocessing techniques—normalization, brain extraction, and cropping—and data augmentation methods—translation, rotation, and Gaussian noise addition—were applied to the MRI images. Model performance was assessed using accuracy, recall, precision, and F1-score.
+We utilized a subset of the COBRE dataset, which includes structural MRI data from 62 individuals, divided into 30 schizophrenia patients and 32 healthy controls. A support vector classifier (SVC) was employed to classify the images. Various preprocessing techniques --- resampling, normalization, brain extraction, cropping, smoothing --- and data augmentation methods -- translation, rotation, and Gaussian noise addition --- were applied to the MRI data. Model performance was assessed using accuracy, recall, precision, and F1-score.
 
 \textbf{Results}\\
-Normalization and brain extraction improved classification accuracy, with cropping achieving the highest accuracy (0.57) and F1-score (0.69) among the preprocessing techniques. Combining preprocessing methods did not always result in performance improvements and sometimes led to a decrease in accuracy. Data augmentation significantly enhanced model performance, with translation and rotation leading to the highest accuracy (0.79) and F1-score (0.80). However, Gaussian noise had a detrimental effect, reducing accuracy and F1-score.
+Normalization and brain extraction improved classification accuracy, with cropping achieving the highest accuracy (57\%) and F1-score (0.69) among the preprocessing techniques. Combining preprocessing methods did not always result in performance improvements and sometimes led to a decrease in accuracy. The combination of resampling, normalization, and brain extraction gave the best performance (accuracy of 55\% and F1-score of 0.69) among the combinations explored in this study. Data augmentation significantly enhanced model performance, with translation and rotation leading to the highest accuracy (0.79) and F1-score (0.80). The data for the final model was preprocessed with the optimal combination, translated, and rotated at random (resampling + normalization + brain extraction + translation + rotation) and produced the highest recorded accuracy and recall scores (81\% and 0.98 respectively).
 
 \textbf{Conclusion}\\
-Our findings indicate that careful selection of preprocessing and augmentation techniques is critical for optimizing model performance in schizophrenia detection. While certain preprocessing steps like normalization and cropping are beneficial, combining them may not always yield additive improvements. Augmentation techniques like translation and rotation proved effective in boosting model performance, while Gaussian noise should be avoided. These results contribute to the development of more standardized preprocessing pipelines for medical imaging, which could enhance the reliability and reproducibility of machine learning models in clinical applications.
+Our findings indicate that careful selection of preprocessing and augmentation techniques is critical for optimizing model performance in schizophrenia detection. While certain preprocessing steps like cropping and smoothing are beneficial, combining them may not always yield additive improvements. Augmentation techniques like translation and rotation proved effective in boosting model performance, due to their ability to increase the data size. These results contribute to the development of more standardized preprocessing pipelines for medical imaging, which could enhance the reliability and reproducibility of machine learning models in clinical applications.
 
 \textbf{Keywords: schizophrenia, sMRI, CNN, SVC}
 
@@ -30,7 +30,7 @@ Schizophrenia (SZ) is a chronic mental disorder affecting 1 in 300 people worldw
 
 Despite progress in CNN-based SZ detection, studies often lack standardized preprocessing pipelines, impacting model reliability and reproducibility. Benchmark datasets~\cite{Oh2020, Verma2023} report high classification accuracies, but inconsistent preprocessing limits comparability.
 
-This project systematically evaluates preprocessing and augmentation techniques (e.g., smoothing, translation) to establish a robust pipeline for SZ detection from MRI. Standardizing these practices could improve the reproducibility and clinical applicability of ML-based diagnostics.
+This study systematically evaluates preprocessing and augmentation techniques to establish a robust pipeline for SZ detection from MRI. Standardizing these practices could improve the reproducibility and clinical applicability of ML-based diagnostics.
 
 % Methods
 \section{Methods}
@@ -44,7 +44,7 @@ The data obtained originates from the Center of Biomedical Research Excellence (
 The data from SchizConnect was filtered based on MRI field strength and clinical diagnosis. We retrieved only images captured with 3T MRI scans. This was done to ensure uniformity of the data obtained. Figure~\ref{fig:raw_mri_volume_slices} presents the example of raw data.
 \begin{figure}[h]
     \centering
-    \includegraphics[width=0.8\textwidth]{./figs/sample_volume.png} % test_pipeline.png
+    \includegraphics[width=0.8\textwidth]{./figs/sample_volume.png} %
     \caption{Three image slices representing the average of a 3D column in three views: dorsal, lateral, and superior respectively}\label{fig:raw_mri_volume_slices}
 \end{figure}
 
@@ -74,36 +74,36 @@ Clinical data was made available in form of CSV files. The demographic features 
 % General thoughts
 The major idea behind preprocessing was to establish a standardized pipeline that ensures consistency in the quality and content of the MRI data. This pipeline addressed common issues such as noise, intensity variations, and artifacts, which can affect the performance of machine learning models.
 
-We experimented with different combinations of preprocessing and data augmentation techniques to determine which pipeline yields the best performance of the ML/DL models regarding recall rate, precision, and F1 score.
+We experimented with different preprocessing and data augmentation techniques, and their combinations, to determine which pipeline yields the best performance of the feature extraction model and a classifier regarding accuracy, recall rate, precision, and F1 score.
 
 In order to find the best combination of hyperparameters for each preprocessing method, we performed a grid search and measured the quality metrics of the processed image using a custom test function.
 
-Table~\ref{tab:preprocessing_pipeline} presents the preprocessing techniques used and their respective hyperparameters and tools used. Figure~\ref{fig:test_pipeline} gives a comparison of a raw image and a preprocessed image, also indicating the image metrics.
+Table~\ref{tab:preprocessing_pipeline} presents the preprocessing techniques used and their respective hyperparameters and tools used. Figure~\ref{fig:slice_comparison} gives a comparison of a raw image and a preprocessed image, also indicating the image metrics.
 %Figure~\ref{fig:test_pipeline} gives a visual representation of the conducted tests.
 %
 \begin{figure}[h]
     \centering
-    \includegraphics[width=0.4\textwidth]{./figs/slice_comparison.png} % test_pipeline.png
-    \caption{Panel (A) shows a slice of a raw scan. Panel (B) shows a slice of a preprocessed scan. For preprocessed scans, the standard deviation of SNR values is relatively low (\mbox{$SNR= 25 \pm 1$}), which ensures consistency in the image quality and prevents the model from making predictions based on possible artifacts.}\label{fig:test_pipeline}
+    \includegraphics[width=0.6\textwidth]{./figs/slice_comparison.png} % test_pipeline.png
+    \caption{Panel A shows a slice of a raw scan. Panel B shows a slice of a preprocessed scan. For preprocessed scans, the standard deviation of SNR values is relatively low (\mbox{$SNR= 25 \pm 1$}), which ensures consistency in the image quality and prevents the model from making predictions based on possible artifacts.}\label{fig:slice_comparison}
 \end{figure}
 
 \subsubsection{Resampling}
 
-The first step of the pipeline is resampling the image to a standard resolution to ensure uniform input for the model and consistent noise and signal profiles.
+The first preprocessing technique employed was resampling the images to a standard resolution to ensure uniform input for the model and consistent noise and signal profiles.
 
 \subsubsection{Intensity normalization}
 
-The second step of the pipeline is normalization of voxel intensities to a consistent range to maintain the relative scale of the data and produce values in a fixed range to satisfy models expectations. The adopted method scales the data to a range of [0, 1].
+The second technique normalization of voxel intensities to a consistent range to maintain the relative scale of the data and produce values in a fixed range to satisfy models expectations. The adopted method scales the data to a range of [0, 1].
 
 Normalization also improves the results of brain extraction by helping the algorithm better distinguish between brain and non-brain regions.
 
-Intensity distributions were inspected to ensure normalization has not distorted the data.
+Intensity distributions were inspected to ensure normalization did not distort the data.
 
 \subsubsection{Brain extraction}
 
-The third step of the pipeline is a brain extraction. The purpose of this stage is to
+The third technique employed was a brain extraction. The purpose of this stage is to
 \begin{itemize}
-    \item remove non-brain regions in order to minimizes noise, making it easier for the network to focus on relevant features;
+    \item remove non-brain regions in order to minimize noise, making it easier for the network to focus on relevant features;
     \item subsequently enhance the network's performance, especially in a schizophrenia detection task where small differences in brain anatomy are crucial;
     \item ensure that the input images are more consistent in terms of content, which can help the model generalize better.
 \end{itemize}
@@ -112,13 +112,13 @@ The generated brain mask was refined by closing gaps and removing small regions.
 
 \subsubsection{Cropping}
 
-The fourth step of the pipeline is cropping the brain region to a consistent size across scans.
+The fourth technique was cropping the brain region to a consistent size across scans.
 
 \subsubsection{Smoothing}
 
-The fifth step of the pipeline is smoothing the brain region to reduce noise and variability introduced by acquisition artifacts, enhancing the overall quality of the images. This was done to ensure that the downstream tasks are more robust and the model training is more effective. We used a Gaussian filter to reduce high-frequency noise while preserving edges to some extent. Since the neural network performed a classification task, moderate smoothing was carried out to focus on broader patterns.
+The fifth technique was smoothing the brain region to reduce noise and variability introduced by acquisition artifacts, enhancing the overall quality of the images. This was done to ensure that the downstream tasks are more robust and the model training is more effective. We used a Gaussian filter to reduce high-frequency noise while preserving edges to some extent. Since the neural network performed a classification task, moderate smoothing was carried out to focus on broader patterns.
 
-The sixth step of the pipeline is normalization of the smoothed image to address potential intensity changes and ensure that all images are on a comparable scale.
+The sixth technique was normalization of the smoothed image to address potential intensity changes and ensure that all images are on a comparable scale.
 
 \subsubsection{Validation}
 
@@ -135,7 +135,7 @@ The metrics were computed for the entire 3D volume to assess the overall quality
 \begin{center}
     \begin{table}
         \centering
-        \caption{\label{tab:preprocessing_pipeline}Preprocessing techniques used in the study.}
+        \caption{\label{tab:preprocessing_pipeline}Preprocessing techniques and the corresponding parameters used in the study.}
         \begin{tabular*}{500pt}{@{\extracolsep\fill}lcc@{\extracolsep\fill}}
             \toprule
             \textbf{Preprocessing Step} & \textbf{Hyperparameters} & \textbf{Tools} \\
@@ -164,17 +164,17 @@ According to typical variations in brain MRI scans, the following transformation
     %\item[\textbf{Option 7}] \textbf{Translation, shearing, and rotation.} Operations are applied subsequently. Implementation of the translation and shearing operations are performed as explained in the previous method. In the rotation step, a random angle is selected within the range $\left[-25^{\circ}, 25^{\circ}\right]$ clockwise rotation is applied. The successive operations are applied 10 times, and 10 images are generated from an input image by this method.
 \end{itemize}
 
-The augmented samples were plotted to ensure the transformations don't distort anatomical features.
+The augmented samples were plotted to ensure the transformations did not distort anatomical features.
 
 %
 \subsection{Model architectures}
 
-Convolutional Neural Networks (CNNs) are commonly used in the literature for this task. However, a few papers explored the use of support vector machines for image classification. To gain a full understanding of both approaches, we decided on the combination of a pretrained deep neural network for feature extraction and a support vector classifier for binary classification. The ReNet-18 architecture was selected for its balance between computational load and accuracy. Cross validation was performed with the support vector classifier (SVC) to choose the best hyperparameters, and the hyperparameters that yielded the best results were the radial basis function (RBF) kernel, a gamma value of 0.0001 and a C parameter value of 100. Each 2D slice of the images were fed into the ResNet-18 model as NumPy arrays of dimension \texttt{224x224}. This input size corresponds to the size of the images in the ImageNet dataset that was used to train ResNet-18 and was selected for compatibility with the pretrained weights of the ResNet-18 model. Figure~\ref{fig:training_architecture} gives a representation of the training architecture and flow.
+Convolutional Neural Networks (CNNs) are commonly used in the literature for this task. However, a few papers explored the use of support vector machines for image classification. To gain a full understanding of both approaches, we decided on the combination of a pretrained deep neural network for feature extraction and a support vector classifier for binary classification. The ReNet-18 architecture was selected for its balance between computational load and accuracy. Cross validation was performed with the support vector classifier (SVC) to choose the best hyperparameters, and the hyperparameters that yielded the best results were the radial basis function (RBF) kernel, a gamma value of 0.0001 and a C parameter value of 100. Each 2D slice of the images were fed into the ResNet-18 model as NumPy arrays of dimension \texttt{224x224}. This input size corresponds to the size of the images in the ImageNet dataset that was used to train ResNet-18 and was selected for compatibility with the pretrained weights of the ResNet-18 model. Figure~\ref{fig:model_architecture} gives a representation of the training architecture and flow.
 %
 \begin{figure}
     \centering
-    \includegraphics[width=0.8\textwidth]{./figs/model_architecture.png} % training_architecture.png
-    \caption{Training architecture and flow.}\label{fig:training_architecture}
+    \includegraphics[width=0.8\textwidth]{./figs/model_architecture.png} %
+    \caption{Overview of the training pipeline. Raw or preprocessed MRI slices are fed into a ResNet-18 model for feature extraction, where convolutional layers, batch normalization, and residual blocks process the input. The final feature vector, obtained after global average pooling and flattening, is passed to an SVM classifier with an RBF kernel for binary classification into schizophrenic and non-schizophrenic labels.}\label{fig:model_architecture}
 \end{figure}
 
 %
@@ -189,31 +189,31 @@ Accuracy, recall, precision, and F1-score were calculated to asses the performan
 
 \subsection{Image Preprocessing}
 
-The results presented in Table~\ref{tab:model_metrics_preprocessing} demonstrate the impact of various preprocessing methods on classification performance. The baseline model using raw images (0) achieved an accuracy of 0.51, with an F1-score of 0.63. Applying resampling (1) alone did not alter these results, suggesting that resampling alone does not introduce substantial benefits.
+The results presented in Table~\ref{tab:model_metrics_preprocessing} demonstrate the impact of various preprocessing methods on classification performance. The baseline model using raw images (0) achieved an accuracy of 51\%, with an F1-score of 0.63. Applying resampling (1) alone did not alter these results, suggesting that resampling alone does not introduce substantial benefits.
 
-Normalization (2) improved accuracy to 0.56 and F1-score to 0.67, indicating that standardizing intensity values enhances model performance. Brain extraction (3) yielded a slightly lower accuracy (0.54) but a notable increase in recall (0.78), which suggests that removing non-brain tissues helps capture more positive instances but may introduce a trade-off in precision.
+Normalization (2) improved accuracy to 56\% and F1-score to 0.67, indicating that standardizing intensity values enhances model performance. Brain extraction (3) yielded a slightly lower accuracy (54\%) but a notable increase in recall (0.78), which suggests that removing non-brain tissues helps capture more positive instances but may introduce a trade-off in precision.
 
-Cropping (4) led to the highest accuracy (0.57) and an F1-score of 0.69, highlighting its effectiveness in improving signal-to-noise ratio. Smoothing (5) showed a moderate impact, improving results compared to the raw data but not outperforming other methods.
+Cropping (4) led to the highest accuracy (57\%) and an F1-score of 0.69, highlighting its effectiveness in improving signal-to-noise ratio. Smoothing (5) showed a moderate impact, improving results compared to the raw data but not outperforming other methods.
 
-When combining preprocessing techniques, the pattern is less straightforward. The combination of resampling, normalization, and brain extraction (1+2+3) resulted in the highest recall (0.80) while maintaining a strong F1-score (0.69). However, adding cropping (1+2+3+4) caused a drastic performance drop, with accuracy declining to 0.44 and F1-score to 0.54. The full pipeline (1+2+3+4+5) slightly improved over this but still underperformed compared to individual preprocessing steps.
+When combining preprocessing techniques, the pattern is less straightforward. The combination of resampling, normalization, and brain extraction (1+2+3) resulted in the highest recall (0.80) while maintaining a strong F1-score (0.69). However, adding cropping (1+2+3+4) caused a drastic performance drop, with accuracy declining to 44\% and F1-score to 0.54. The full pipeline (1+2+3+4+5) slightly improved over this but still underperformed compared to individual preprocessing steps.
 \begin{center}
 	\begin{table}[t]
 		\centering
-		\caption{\label{tab:model_metrics_preprocessing}Desct}
+		\caption{\label{tab:model_metrics_preprocessing}Classification performance metrics for different preprocessing methods. Accuracy, recall, precision, and F1-score are reported for models trained on raw MRI slices and various preprocessing techniques. While normalization (2) and cropping (4) provided the highest accuracy (57\%), brain extraction (3) led to the highest recall (0.78). The combination of resampling, normalization, and brain extraction (1+2+3) resulted in the best recall (0.80) with a strong F1-score (0.69). However, adding cropping (1+2+3+4) and smoothing (1+2+3+4+5) led to performance degradation, suggesting that excessive preprocessing may reduce classification effectiveness.}
 		\begin{tabular*}{500pt}{@{\extracolsep\fill}lcccc@{\extracolsep\fill}}
 			\toprule
-		     \textbf{Preprocessing method} &\textbf{Accuracy} &  \textbf{Recall} &\textbf{Precision} &\textbf{F1-score}\\
+		     \textbf{Preprocessing method} &\textbf{Accuracy (\%)} &  \textbf{Recall} &\textbf{Precision} &\textbf{F1-score}\\
 			\midrule
-			Raw (0) & 0.51 & 0.67 & 0.60 & 0.63 \\
-			Resampling (1) & 0.51 & 0.67 & 0.60 & 0.63 \\
-			Normalization (2) & 0.56 & 0.69 & 0.64 & 0.67 \\
-			Brain extraction (3) & 0.54 & 0.78 & 0.60 & 0.68 \\
-			Cropping (4) & 0.57 & 0.76 & 0.63 & 0.69 \\
-			Smoothing (5) & 0.55 & 0.71 & 0.62 & 0.66 \\
-            1+2 & 0.57 & 0.69 & 0.64 & 0.67 \\
-            1+2+3 & 0.55 & 0.80 & 0.61 & 0.69 \\
-            1+2+3+4 & 0.44 & 0.53 & 0.56 & 0.54 \\
-            1+2+3+4+5 & 0.48 & 0.60 & 0.58 & 0.59 \\
+			Raw (0) & 51\% & 0.67 & 0.60 & 0.63 \\
+			Resampling (1) & 51\% & 0.67 & 0.60 & 0.63 \\
+			Normalization (2) & 56\% & 0.69 & 0.64 & 0.67 \\
+			Brain extraction (3) & 54\% & 0.78 & 0.60 & 0.68 \\
+			Cropping (4) & 57\% & 0.76 & 0.63 & 0.69 \\
+			Smoothing (5) & 55\% & 0.71 & 0.62 & 0.66 \\
+            1+2 & 57\% & 0.69 & 0.64 & 0.67 \\
+            1+2+3 & 55\% & 0.80 & 0.61 & 0.69 \\
+            1+2+3+4 & 44\% & 0.53 & 0.56 & 0.54 \\
+            1+2+3+4+5 & 48\% & 0.60 & 0.58 & 0.59 \\
 			\bottomrule
 		\end{tabular*}
 	\end{table}
@@ -221,28 +221,42 @@ When combining preprocessing techniques, the pattern is less straightforward. Th
 
 \subsection{Data Augmentation}
 
-The results presented in Table~\ref{tab:model_meetrics_augmentation} highlight the impact of various data augmentation methods on model performance. The baseline model using raw data (0) achieved an accuracy of 0.51 and an F1-score of 0.63. In contrast, applying translation (1) significantly improved both accuracy (0.75) and F1-score (0.79), with a notable increase in recall (0.84), indicating that translation is effective at boosting model performance and sensitivity.
+The results presented in Table~\ref{tab:model_meetrics_augmentation} highlight the impact of various data augmentation methods on model performance. The baseline model using raw data (0) achieved an accuracy of 0.51 and an F1-score of 0.63. In contrast, applying translation (6) significantly improved both accuracy (75\%) and F1-score (0.79), with a notable increase in recall (0.84), indicating that translation is effective at boosting model performance and sensitivity.
 
-Rotation (2) further improved results, with the highest accuracy (0.79) and F1-score (0.80), alongside strong recall (0.81) and precision (0.78), demonstrating its ability to enhance both model robustness and overall performance.
+Rotation (7) further improved results, with the highest accuracy (79\%) and F1-score (0.80), alongside strong recall (0.81) and precision (0.78), demonstrating its ability to enhance both model robustness and overall performance.
 
-Gaussian noise (3), however, led to a substantial decrease in performance, with an accuracy of only 0.33 and a low F1-score of 0.40. This suggests that adding noise may negatively affect the model, potentially obscuring relevant patterns in the data.
-
+Gaussian noise (8), however, led to a substantial decrease in performance, with an accuracy of only 33\% and a low F1-score of 0.40. This suggests that adding noise may negatively affect the model, potentially obscuring relevant patterns in the data.
 \begin{center}
 	\begin{table}[t]
 		\centering
-		\caption{\label{tab:model_meetrics_augmentation}Desct}
+		\caption{\label{tab:model_meetrics_augmentation}Classification performance metrics for different data augmentation methods. Accuracy, recall, precision, and F1-score are reported for models trained on raw MRI slices and augmented datasets. Both translation (6) and rotation (7) significantly improved model performance, with rotation achieving the highest accuracy (79\%) and F1-score (0.80). In contrast, Gaussian noise (8) led to a severe drop in performance, reducing accuracy to 33\% and F1-score to 0.40. The final training setup, combining preprocessing with translation and rotation (1+2+3+6+7), achieved the best overall results, with 81\% accuracy and the highest recall (0.98), indicating the effectiveness of spatial transformations in improving classification.}
 		\begin{tabular*}{500pt}{@{\extracolsep\fill}lcccc@{\extracolsep\fill}}
 			\toprule
-			\textbf{Augmentation method} &\textbf{Accuracy} &  \textbf{Recall} &\textbf{Precision} &\textbf{F1-score}\\
+			\textbf{Augmentation method} &\textbf{Accuracy (\%)} &  \textbf{Recall} &\textbf{Precision} &\textbf{F1-score}\\
 			\midrule
 			Raw (0) & 0.51 & 0.67 & 0.60 & 0.63 \\
-			Translation (1) & 0.75 & 0.84 & 0.74 & 0.79 \\
-			Rotation (2) & 0.79 & 0.81 & 0.78 & 0.80 \\
-			Gaussian Noise (3) & 0.33 & 0.32 & 0.53 & 0.40 \\
+			Translation (6) & 75\% & 0.84 & 0.74 & 0.79 \\
+			Rotation (7) & 79\% & 0.81 & 0.78 & 0.80 \\
+			Gaussian Noise (8) & 33\% & 0.32 & 0.53 & 0.40 \\
+            Final training (1+2+3+6+7) & 81\% & 0.98 & 0.77 & 0.86 \\
 			\bottomrule
 		\end{tabular*}
 	\end{table}
 \end{center}
+
+The final training combined the optimal combination of preprocessing with translation and rotation techniques (1+2+3+6+7), surpassing the accuracy and recall of all the experiments (81\% and 0.98 respectively), with a precision value only surpassed by the rotation experiment. Figure~\ref{fig:eval_final_model} shows the output of the final training and Figure~\ref{fig:model_metrics_comparison} shows the comparison between the metrics of all the preprocessing and augmentation experiments.
+\begin{figure}
+    \centering
+    \includegraphics[width=0.8\textwidth]{./figs/eval_final_model.png} % 
+    \caption{Preprocessing and augmentation steps: resampling + normalization + brain extraction + translation + rotation. Panel A: confusion matrix with recall of 0.98. Panel B: ROC curve with AUC of 0.86}\label{fig:eval_final_model}
+\end{figure}
+
+\begin{figure}
+    \centering
+    \includegraphics[width=0.8\textwidth]{./figs/model_metrics_comparison.png} % 
+    \caption{Summary of the metrics for each preprocessing experiment. Panel A: comparison of accuracies across the experiments. The highest accuracy was recorded in the final experiment combining resampling, normalization, brain extraction, translation and rotation. Panel B: comparison of recall scores. The final experiment yielded the highest recall score. Panel C: comparison of precision scores. The rotation experiment produced the highest score, probably due to an increase in instances of the negative class after augmentation. The numbers along the y-axis represent preprocessing and augmentation scenarios: 0 --- raw images, 1 --- resampling, 2 --- normalization, 3 --- brain extraction, 4 --- cropping, 5 --- smoothing, 6 --- translation, 7 --- rotation, 8 --- Gaussian noise.}\label{fig:model_metrics_comparison}
+\end{figure}
+
 
 % Discussion
 \section{Discussion}
