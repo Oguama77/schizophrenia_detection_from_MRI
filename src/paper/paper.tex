@@ -180,9 +180,9 @@ Convolutional Neural Networks (CNNs) are commonly used in the literature for thi
 %
 \subsection{Training and validation}
 
-The dataset was split into a training set (80\%) and a validation set (20\%). 
+The dataset was split into a training set (80\%) and a validation set (20\%). Preprocessing, including resampling, normalization, and brain extraction, was applied before training. Data augmentation (translation and rotation) was performed on the training set to improve model generalization, while the validation set remained unaltered.
 
-Accuracy, recall, precision, and F1-score were calculated to asses the performance of the SVC.
+A Support Vector Classifier (SVC) was trained with an RBF kernel, kernel coefficient \mbox{$gamma=0.0001$} and optimized using regularization parameter \mbox{$C=100$}. Accuracy, recall, precision, and F1-score were used to assess performance of the Classifier.
 
 % Results
 \section{Results}
