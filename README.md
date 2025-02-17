@@ -13,13 +13,13 @@ Example of the raw data:
 </p>
 
 ### Project Workflow
-[Data Loading](src/utils/data_loader.py) >> [Data Exploration](src/utils/eda.py) >> [Preprocessing](src/utils/preprocess.py) >> [Validating Preprocessing Output](src/utils/preprocess_validation.py) >> [Augmentation](src/utils/augmentations.py) >> [Feature Extraction](src/models/cnn.py) & [Training](src/models/svm.py) >> [Visualizing training results](src/utils/plot_svm_metrics.py)
+[Data Loading](src/utils/data_loader.py) >> [Data Exploration](src/utils/eda.py) >> [Preprocessing](src/utils/preprocess.py) >> [Validating Preprocessing Output](src/utils/preprocess_validation.py) >> [Augmentation](src/utils/augmentations.py) >> [Feature Extraction](src/models/cnn.py) & [Classification](src/models/svm.py) >> [Visualizing training results](src/utils/plot_svm_metrics.py)
 
 &check; Data Exploration: assessed demographic features and gender/age distributions;
 
 &check; Preprocessing & Augmentation: experimented with different combinations of preprocessing and data augmentation techniques to determine which pipeline yields the best performance of the ML/DL models;
 
-&check; Feature Extraction & Training: harnessed ResNet-18 to extract features and SVC to classify them;
+&check; Feature Extraction & Classification: harnessed ResNet-18 to extract features and SVC to classify them;
 
 &check; Visualization: obtained classifier metrics and compared results across experiments.
 
