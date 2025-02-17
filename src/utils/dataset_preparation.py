@@ -5,7 +5,7 @@ from logger import logger
 from utils.preprocess import load_nii, resample_image, normalize_data
 
 
-def prepare_dataset(train_ratio: float = 0.76,
+def prepare_dataset(train_ratio: float = 0.8,
                     raw_nii_dir: str = "data/raw_nii",
                     train_set_output_dir: str = "train_set",
                     test_set_output_dir: str = "test_set",
@@ -56,8 +56,7 @@ def prepare_dataset(train_ratio: float = 0.76,
                                                min_val=min_max_min_val,
                                                max_val=min_max_max_val)
 
-            torch.save(torch.tensor(processed_img, dtype=torch.float32),
-                       os.path.join(save_dir, img))
+            torch.save(torch.tensor(processed_img, dtype=torch.float32), os.path.join(save_dir, img + ".pt"))
 
     # Process .nii images
     process_and_save_nii(train_images, raw_nii_dir, train_nii_dir)

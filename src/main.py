@@ -4,7 +4,7 @@ from utils.eda import SchizophreniaEDA
 from utils.dataset_preparation import prepare_dataset
 from utils.preprocessing import preprocess_images
 from utils.augment_images import augment_images
-#from utils.feature_extractor import feature_extraction_pipeline
+from utils.feature_extractor import feature_extraction_pipeline
 from utils.classifier import train_and_evaluate
 from utils.plot_svm_metrics import SVMVisualizer
 
@@ -89,7 +89,7 @@ def main():
     """
     if IS_PERFORM_EDA:
         eda = SchizophreniaEDA(path_to_clinical_data=CLINICAL_DATA_DIR, 
-                               path_to_raw_images=RAW_PT_DATA_DIR,
+                               path_to_raw_images=RAW_PT_DATA_DIR, 
                                output_path=OUTPUT_PATH_EDA)
         eda.plot_age_distribution()
         eda.plot_gender_distribution()
@@ -144,7 +144,7 @@ def main():
             train_set_dir=TRAIN_SET_DIR,
             test_set_dir=TEST_SET_DIR,
             is_normalize=IS_NORMALIZE_WHEN_PREPROCESS,
-            norm_metod=NORMALIZATION_METHOD,
+            norm_method=NORMALIZATION_METHOD,
             min_max_min_val=MIN_VAL,
             min_max_max_val=MAX_VAL,
             is_brain_extraction=IS_BRAIN_EXTRACTION,
