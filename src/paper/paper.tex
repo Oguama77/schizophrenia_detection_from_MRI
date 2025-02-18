@@ -39,9 +39,9 @@ This study systematically evaluates preprocessing and augmentation techniques to
 
 The raw data were obtained from the \href{http://schizconnect.org}{SchizConnect} database (accessed January 1, 2025), which houses structural and functional MRI data. The database provides filtering options to enable users to select data that meets specific criteria including MRI field strength and clinical diagnosis (e.g. schizophrenia, bipolar disorder).
 
-The data obtained originates from the Center of Biomedical Research Excellence (COBRE) dataset in NifTI format. It includes data from 62 individuals, 30 with schizophrenia and 32 healthy controls.
+The data obtained originates from the Center of Biomedical Research Excellence (COBRE) dataset in NifTI format. It includes data from 62 individuals, 30 with schizophrenia and 32 healthy controls. The subset used consists of 62 three-dimensional (3D) MRI scans with 192 slices each, bringing the total number of slices to 11,904. The list of subjects whose images were used can be obtained from the \href{https://github.com/Eager1Beaver/schizo/blob/main/data/clinical_data.csv}{clinical data}
 
-The data from SchizConnect was filtered based on MRI field strength and clinical diagnosis. We retrieved only images captured with 3T MRI scans. This was done to ensure uniformity of the data obtained. Figure~\ref{fig:raw_mri_volume_slices} presents the example of raw data.
+The data from SchizConnect was filtered based on MRI field strength and clinical diagnosis. We retrieved only T1-weighted images (MPRAGE sequence) acquired using 3T MRI scanners. This was done to ensure uniformity of the data obtained. Figure~\ref{fig:raw_mri_volume_slices} presents the example of raw data.
 \begin{figure}[h]
     \centering
     \includegraphics[width=0.8\textwidth]{./figs/sample_volume.png} %
